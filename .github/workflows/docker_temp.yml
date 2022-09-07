@@ -1,0 +1,54 @@
+# Automated FB Ads extraction with GitHub Actions
+
+name: Extraction of FB ads with Docker Image
+
+# Controls when the action will run.
+on:
+  schedule:
+    - cron:  '00 12 * * *'
+  push:
+    branches: master
+
+jobs:
+  extract:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container: rocker/tidyverse:latest
+
+    # Load repo and run the extraction script
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check validity of FB ADS API token
+      env:
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+    - name: Compile monitored pages list
+      run: Rscript 00_save_pages_list.R
+    - name: Extract FB Ads
+    # This action needs a FB API token as an environment variable (we are using GitHub Secrets). We also need to get GH personal access token, because we are installing Radlibrary from GH repository
+      env:
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.GH_PAT }}
+      run: Rscript 01_ads_extract_temp.R
+    - name: Create summary tables
+      run: Rscript 02_create_summary_tables_temp.R
+    - name: Install Flexdashboard package
+      run: Rscript -e "install.packages('flexdashboard')"
+    - name: Update Dashboard for GitHub Pages
+      run: Rscript -e "rmarkdown::render('index.Rmd')"
+    - name: Print information about the session
+      run: Rscript -e "sessionInfo()"
+
+    # Add new files in specified folder, commit along with other modified files, push
+    - name: Commit files
+      run: |
+        git config --local user.name actions-user
+        git config --local user.email "actions@github.com"
+        git add data/* index.html
+        git commit -am "GH Action $(date)"
+        git push origin master
+      env:
+        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+        username: github-actions
