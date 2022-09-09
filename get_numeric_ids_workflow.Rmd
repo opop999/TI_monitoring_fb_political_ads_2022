@@ -96,13 +96,13 @@ top_ads_scrape("div._7vgi:nth-of-type(4n+2)", "a._7vge._7via");
 json_chunks <- list.files(path = "data", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
 
 # Specify which entities are removed from the coverage
-remove_pages <- c("European Parliament")
+remove_pages <- c("178362315106", "28312410177", "484856584931855")
 
 # Read all of the JSON data chunks in. 
 pages_list <- json_chunks %>% 
   map(read_json) %>% 
   unlist(recursive = TRUE) %>%
-  .[!names(.) %in% remove_pages]
+  .[!. %in% remove_pages]
 # Optional: If using batch API query with multiple entities per call, you need to create a list of max 10 entities per element due to the limitations of the FB Ads API.
   #  %>% 
   # split(., ceiling(seq_along(.) / 10))
