@@ -4,16 +4,16 @@
 
 # PART 1: LOAD THE REQUIRED LIBRARIES FOR THIS SCRIPT
 
-# Package names
-packages <- c("dplyr", "tidyr", "remotes", "data.table", "arrow")
+# Specify the package names we will be using.
+packages <- c("dplyr", "tidyr", "remotes")
 
-# Install packages not yet installed
+# Install packages not yet installed.
 installed_packages <- packages %in% rownames(installed.packages())
 if (any(installed_packages == FALSE)) {
   install.packages(packages[!installed_packages])
 }
 
-# Packages loading
+# Packages loading.
 invisible(lapply(packages, library, character.only = TRUE))
 
 # We have to install the Radlibrary package, which is available only on GitHub
@@ -21,11 +21,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 # remotes package. We also specify argument "upgrade" to never, so we do not get
 # a dialog window asking us whether to update when the script runs automatically.
 
-# The Radlibrary 0.3 version has issues serving demographic and regional FB Ads data
-# remotes::install_github("facebookresearch/Radlibrary", upgrade = "never", dependencies = TRUE)
-
-# Temporalily using forked version of the Radlibrary 0.3 with a fix
-remotes::install_github("opop999/Radlibrary", upgrade = "never", dependencies = TRUE)
+remotes::install_github("facebookresearch/Radlibrary", upgrade = "never", dependencies = TRUE)
 
 library(Radlibrary)
 
@@ -77,10 +73,10 @@ get_all_tables_merge <- function(token, parties_ids, min_date, max_date, directo
         limit = 1000,
         search_page_ids = parties_ids[[p]],
         fields = fields_vector[i]
-      )
-
+      ) 
+      query$search_type <- NULL
       # The call is limited to last 1000 results, pagination overcomes it
-      response <- adlib_get_paginated(query, token, max_gets = 100)
+      response <- adlib_get_paginated(query, token = token, max_gets = 100)
 
       assign(
         paste0(
@@ -110,34 +106,36 @@ get_all_tables_merge <- function(token, parties_ids, min_date, max_date, directo
   # format and we need a transformation to a "wide" format of the ad dataset
 
   dataset_demographic_wide <- dataset_demographic %>%
+    unnest(col = "demographic_distribution") %>% 
     mutate(across(percentage, round, 3)) %>%
     pivot_wider(
-      id_cols = adlib_id,
+      id_cols = id,
       names_from = c("gender", "age"),
-      names_sort = TRUE,
-      values_from = percentage
+      values_from = percentage,
+      names_sort = TRUE
     )
 
   dataset_region_wide <- dataset_region %>%
+    unnest(col = "delivery_by_region") %>% 
     mutate(across(percentage, round, 3)) %>%
     pivot_wider(
-      id_cols = adlib_id,
+      id_cols = id,
       names_from = region,
-      names_sort = TRUE,
-      values_from = percentage
+      values_from = percentage,
+      names_sort = TRUE
     )
 
   # Performing the join on common columns across the 3 datasets
   merged_dataset <- dataset_ad %>%
-    left_join(dataset_demographic_wide, by = "adlib_id") %>%
-    left_join(dataset_region_wide, by = "adlib_id") %>%
+    left_join(dataset_demographic_wide, by = "id") %>%
+    left_join(dataset_region_wide, by = "id") %>%
     mutate(across(c(
-      "funding_entity",
+      "bylines",
       "currency",
       "page_name",
       "page_id"
     ), factor)) %>%
-    filter(ad_creation_time >= as.Date("2021-01-01")) %>%
+    filter(ad_creation_time >= as.Date(min_date)) %>%
     arrange(desc(ad_creation_time))
 
   # We save each of the three tables in a memory to a dedicated csv and rds file
@@ -150,15 +148,14 @@ get_all_tables_merge <- function(token, parties_ids, min_date, max_date, directo
   fwrite(x = dataset_demographic_wide, file = paste0(directory, "/demographic_data.csv"))
   fwrite(x = dataset_region_wide, file = paste0(directory, "/region_data.csv"))
   fwrite(x = merged_dataset, file = paste0(directory, "/merged_data.csv"))
-  saveRDS(object = merged_dataset, file = paste0(directory, "/merged_data.rds"), compress = FALSE)
-  write_feather(x = merged_dataset, sink = paste0(directory, "/merged_data.feather"))
-
+  saveRDS(object = merged_dataset, file = paste0(directory, "/merged_data.rds"))
+  
   # Saving a "lean" version of the dataset, which contains only id and text
   # We will use this in a different repository (social media scrape through Hlidac Statu)
   merged_dataset_lean <- merged_dataset %>%
-   select(page_name, page_id, ad_creative_body)
+   select(page_name, page_id, ad_creative_bodies)
 
- saveRDS(object = merged_dataset_lean, file = paste0(directory, "/merged_data_lean.rds"), compress = TRUE)
+ saveRDS(object = merged_dataset_lean, file = paste0(directory, "/merged_data_lean.rds"))
 }
 
 ############################### FUNCTION END ###################################
@@ -166,10 +163,10 @@ get_all_tables_merge <- function(token, parties_ids, min_date, max_date, directo
 
 # PART 3: SPECIFY THE ARGUMENTS NEEDED TO RUN THE FUNCTION
 
-# Current token expires on December 8 2021. It need to be prolonged before then.
+# Current token expires within 60 days of issue. It need to be prolonged before then.
 token <- Sys.getenv("FB_TOKEN")
 
-min_date <- "2021-01-01"
+min_date <- "2022-09-01"
 
 # Get today's date in format FB wants for automation
 max_date <- format((Sys.Date()), "%Y-%m-%d")
@@ -183,7 +180,7 @@ max_date <- format((Sys.Date()), "%Y-%m-%d")
 # To make this script more legible, ids are specified in a separate script file
 # named "monitored_pages_list.R" which also saves rds file that is loaded below.
 
-parties_ids <- readRDS("data/saved_pages_list.rds")
+parties_ids <- readRDS("data/saved_pages_list.rds")[1:2]
 
 # Specify the desired output folder
 directory <- "data"

@@ -1,0 +1,122 @@
+# Specify
+
+This part of the analytical workflow aims to create a compatible list of political entities and their FB page IDs as an input for the automatic extraction. This workflow is meant to be run manually. As an alternative, users can specify their own list of accounts as a list of elements (with max 10 ids per element due to the API limitations). Each element of this list is a (named) vector of FB page IDs that are used by the API to identify each political advertiser.
+
+```{r setup}
+# Package names
+packages <- c("jsonlite", "dplyr", "purrr")
+
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages])
+}
+
+# Packages loading
+invisible(lapply(packages, library, character.only = TRUE))
+
+# We have to create a desired data directory, if one does not yet exist
+if (!dir.exists("data")) {
+  dir.create("data")
+} else {
+  print("Output directory already exists")
+}
+```
+
+In this workflow, we are interested in getting the FB page IDs for the biggest recent spenders according to the Meta Ad Library report webpage, which serves as a good overview in this regard.
+
+Go to [Meta Ads Library](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ) report and select an appropriate timeframe, such as last 90 days. Run the following code in the browser console. Save the resulting JSON file in the data folder in this repository.
+
+```{js}
+// Function to enable saving to JSON
+// e.g. console.save({hello: 'world'})
+(function (console) {
+  console.save = function (data, filename) {
+    if (!data) {
+      console.error("Console.save: No data");
+      return;
+    }
+    if (!filename) filename = "console.json";
+    if (typeof data === "object") {
+      data = JSON.stringify(data, undefined, 4);
+    }
+    var blob = new Blob([data], { type: "text/json" }),
+      a = document.createElement("a");
+    var e = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: false,
+    });
+    a.download = filename;
+    a.href = window.URL.createObjectURL(blob);
+    a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
+    a.dispatchEvent(e);
+  };
+})(console);
+
+// Define function to scrape the top spenders and their ids
+function top_ads_scrape(name, id) {
+  // initiate empty dictionary
+  var entities = {};
+
+  var len = document.querySelectorAll(id).length;
+
+  console.assert(typeof len === "number", "Length is not a number");
+
+  window.onload = function () {
+    for (let i = 0; i < len; i++) {
+      entities[document.querySelectorAll(name)[i]?.innerText] = document
+        .querySelectorAll(id)
+        [i]?.attributes["href"].nodeValue.split("id=")[1];
+    }
+  };
+
+  window.onload();
+
+  // Copy to clipboard
+  copy(entities);
+  // make a table
+  console.table(entities);
+  
+  current_page = document.querySelector("div._7vg- > div > div").innerText.split("/")[0].trim()
+  
+  return console.save(entities, "top_spenders_p_" + current_page + ".json");
+}
+
+// For FB ADS
+top_ads_scrape("div._7vgi:nth-of-type(4n+2)", "a._7vge._7via");
+
+// Optional: for pagination use the following
+// document.querySelector("div._7vg- > div > div > button:nth-of-type(2)").click();
+
+```
+
+```{r}
+# List all of the JSON data scraped from FB Ads library in the previous step
+json_chunks <- list.files(path = "data", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
+
+# Specify which entities are removed from the coverage
+remove_pages <- c("European Parliament")
+
+# Read all of the JSON data chunks in. 
+pages_list <- json_chunks %>% 
+  map(read_json) %>% 
+  unlist(recursive = TRUE) %>%
+  .[!names(.) %in% remove_pages]
+# Optional: If using batch API query with multiple entities per call, you need to create a list of max 10 entities per element due to the limitations of the FB Ads API.
+  #  %>% 
+  # split(., ceiling(seq_along(.) / 10))
+
+# Save the list to the .rds file
+saveRDS(pages_list, "data/saved_pages_list.rds")
+
+# Delete the uneeded JSON chunks based on user input
+if (readline(prompt = "Do you want to delete the JSON chunks (y/n) : ") == "y") {
+  unlink(json_chunks)
+  print("All JSON chunks deleted.")
+} else {
+  print("JSON chunks won't be deleted.")
+}
+
+
+```

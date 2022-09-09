@@ -49,7 +49,7 @@ print(paste0("The token expires: ",
 
 if (expiration_time - as.POSIXct(Sys.Date()) > 7) {
 
-	print("More than week remains before the token expires. Everything is OK.")
+	print("More than a week remains before the token expires. Everything is OK.")
 
 } else if (expiration_time - as.POSIXct(Sys.Date()) < 7) {
 
@@ -85,11 +85,11 @@ if (expiration_time - as.POSIXct(Sys.Date()) > 7) {
 						getting the short-lived access token and then using the '00_generate_FB_bearer_token.R' script
 						to obtain the long-term bearer token (lasting approximately another 60 days).
 
-						Cheers,
+						Have a wonderful day,
 
 						GitHub Actions automation")))
 
-	# Add credentials and send email message
+	# Add credentials and send email message. Currently, Outlook emails seems to work the best. 
 	smtp_send(email = email_message,
 						from = Sys.getenv("EMAIL_USER"),
 						to = Sys.getenv("EMAIL_TO"),
@@ -97,9 +97,9 @@ if (expiration_time - as.POSIXct(Sys.Date()) > 7) {
 														round(expiration_time - as.POSIXct(Sys.Date())),"days"),
 						credentials = creds_envvar(user = Sys.getenv("EMAIL_USER"),
 																			 pass_envvar = "EMAIL_PASSWORD", # In accounts with 2FA, need to get app pass
-																			 provider = gmail,
-																			 host = smtp.gmail.com,
-																			 port = 465,
+																			 provider = "outlook",
+																			 host = "smtp-mail.outlook.com",
+																			 port = 587,
 																			 use_ssl = TRUE))
 }
 

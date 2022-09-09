@@ -18,7 +18,7 @@ options(scipen = 999)
 # Specify directory
 directory <- "data"
 
-full_ads_table <- readRDS(paste0(directory, "/merged_data.rds"))
+full_ads_table <- readRDS(paste0(directory, "/merged_dataset.rds"))
 
 if (!dir.exists(paste0(directory, "/summary_tables"))) {
   dir.create(paste0(directory, "/summary_tables"))
@@ -31,31 +31,23 @@ if (!dir.exists(paste0(directory, "/summary_tables"))) {
 # Creating a summary table focused on the detailed aspects of the advertising
 # Percentage figures rounded to 3 decimal places
 ad_summary <- full_ads_table %>%
-  select(1:19) %>%
+  select(1:21) %>%
   group_by(page_name, page_id) %>%
   summarise(
     total_ads = n(),
-    unique_ads = n_distinct(ad_creative_body),
+    unique_ads = n_distinct(ad_creative_bodies),
     percent_unique = round(unique_ads / total_ads, digits = 3),
-    avg_words = round(mean(str_count(ad_creative_body, "\\w+"), na.rm = TRUE)),
-    # avg_char = round(mean(nchar(ad_creative_body), na.rm = TRUE)),
-    # lower_spend = sum(spend_lower, na.rm = TRUE),
-    # upper_spend = sum(spend_upper, na.rm = TRUE),
+    avg_words = round(mean(str_count(ad_creative_bodies, "\\w+"), na.rm = TRUE)),
     avg_spend = round(((sum(spend_lower, na.rm = TRUE) + sum(spend_upper, na.rm = TRUE)) / 2), digits = 0),
     per_ad_avg_spend = round(avg_spend / total_ads, digits = 0),
-    # total_lower_impressions = sum(impressions_lower, na.rm = TRUE),
-    # total_upper_impressions = sum(impressions_upper, na.rm = TRUE),
     total_avg_impressions = round(((sum(impressions_lower, na.rm = TRUE) + sum(impressions_upper, na.rm = TRUE)) / 2), digits = 0),
     per_ad_avg_impression = round(total_avg_impressions / total_ads, digits = 0),
-    total_min_reach = sum(potential_reach_lower, na.rm = TRUE),
+    total_min_reach = sum(estimated_audience_size_lower, na.rm = TRUE),
     per_ad_min_reach = round(total_min_reach / total_ads, digits = 0),
     avg_ad_runtime = round(mean(ad_delivery_stop_time - ad_delivery_start_time, na.rm = TRUE), digits = 1)
   ) %>%
   arrange(desc(total_ads)) %>%
   ungroup()
-
-# Writing the table to a csv file
-fwrite(ad_summary, paste0(directory, "/summary_tables/ad_summary.csv"))
 
 # Creating a summary table focused on the demographic aspects
 # Percentage figures rounded to 3 decimal places
@@ -109,10 +101,6 @@ demographic_summary <- full_ads_table %>%
   arrange(desc(total_ads)) %>%
   ungroup()
 
-# Writing the table to a csv file
-fwrite(demographic_summary, paste0(directory, "/summary_tables/demographic_summary.csv"))
-
-
 # Creating a summary table focused on the regional aspects
 # We rename the Czech regions using Czech Statistical Office abbreviations
 # Percentage figures rounded to 3 decimal places
@@ -157,9 +145,6 @@ region_summary <- full_ads_table %>%
   arrange(desc(total_ads)) %>%
   ungroup()
 
-# Writing the table to a csv
-fwrite(region_summary, paste0(directory, "/summary_tables/region_summary.csv"))
-
 # Creating a summary table with cumulative spending per page throughout time
 time_summary <- full_ads_table %>%
   arrange(ad_creation_time) %>%
@@ -172,9 +157,7 @@ time_summary <- full_ads_table %>%
   mutate(cumulative_spend = cumsum(avg_spend)) %>%
   ungroup()
 
-fwrite(time_summary, paste0(directory, "/summary_tables/time_summary.csv"))
-saveRDS(object = time_summary, file = paste0(directory, "/summary_tables/time_summary.rds"), compress = FALSE)
-
+saveRDS(object = time_summary, file = paste0(directory, "/summary_tables/time_summary.rds"))
 
 # Merge ad, demographic and region table to one
 merged_summary <- ad_summary %>%
@@ -182,5 +165,5 @@ merged_summary <- ad_summary %>%
   inner_join(region_summary, by = c("page_name", "page_id", "total_ads"))
 
 fwrite(merged_summary, paste0(directory, "/summary_tables/merged_summary.csv"))
-saveRDS(object = merged_summary, file = paste0(directory, "/summary_tables/merged_summary.rds"), compress = FALSE)
+saveRDS(object = merged_summary, file = paste0(directory, "/summary_tables/merged_summary.rds"))
 

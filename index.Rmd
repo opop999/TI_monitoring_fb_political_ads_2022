@@ -1,6 +1,6 @@
 ---
 title: "Facebook ADS"
-author: "Ondrej Pekacek/TI CZ"
+author: "Ondrej Pekacek for TI CZ"
 date: "Update `r format(Sys.time(),'%d. %m. %Y')`"
 output: 
   flexdashboard::flex_dashboard:
@@ -8,11 +8,11 @@ output:
     theme: cosmo
     orientation: columns
     vertical_layout: fill
-    source_code: https://github.com/opop999/election_monitoring_fb_ads
+    source_code: https://github.com/opop999/TI_monitoring_fb_political_ads_2022
     navbar:
-      - {title: "Project", icon: "ion-information-circled", href: "https://www.transparentnivolby.cz/snemovna2021"}
+      - {title: "Project", icon: "ion-information-circled", href: "https://www.transparentnivolby.cz"}
       - {title: "Author", icon: "ion-social-linkedin", href: "https://www.linkedin.com/in/ondrej-pekacek"}
-      - {title: "Data: FB", icon: "ion-cloud", href: "https://www.facebook.com/ads/library/"}
+      - {title: "Data: META", icon: "ion-cloud", href: "https://www.facebook.com/ads/library/"}
 ---
 
 ```{r setup, include=FALSE}
