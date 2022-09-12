@@ -5,7 +5,7 @@
 # PART 1: LOAD THE REQUIRED LIBRARIES FOR THIS SCRIPT
 
 # Specify the package names we will be using.
-packages <- c("dplyr", "tidyr", "remotes", "purrr")
+packages <- c("dplyr", "tidyr", "data.table", "remotes", "purrr")
 
 # Install packages not yet installed.
 installed_packages <- packages %in% rownames(installed.packages())
@@ -32,7 +32,7 @@ options(scipen = 999)
 
 ############################### FUNCTION BEGGINING #############################
 
-get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_name = "data/", old_df = NA, new_df = "merged_dataset.rds") {
+get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_name = "data/", old_df = NA, new_df = "merged_dataset") {
   
   if (nchar(token) < 50) { stop("Token is missing or misspecified.") }
   
@@ -116,6 +116,9 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
     }
   }
   
+  saveRDS(object = fb_ad_list, file = paste0(dir_name, "fb_ad_list.rds"))
+  
+  
   # C. MERGE PART OF THE FUNCTION
   # After extraction of the three tables through the for loop, we transform
   # and merge into one. The demographic & region datasets are in the "long"
@@ -175,7 +178,8 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
   merged_dataset <- merged_dataset %>% 
     mutate(across(where(is.list), ~ map_dbl(.x, ~ ifelse(is.null(.x), NA, .x[[1]]))))
   
-  saveRDS(object = merged_dataset, file = paste0(dir_name, new_df))
+  saveRDS(merged_dataset, file = paste0(dir_name, new_df, ".rds"))
+  fwrite(merged_dataset, file = paste0(dir_name, new_df, ".csv"))
   
 }
 
@@ -186,10 +190,7 @@ get_all_tables_merge(
   token = Sys.getenv("FB_TOKEN"),
   account_ids = readRDS("data/saved_pages_list.rds"),
   min_date = "2022-04-13",
-  max_date = format((Sys.Date()), "%Y-%m-%d"),
-  # dir_name = "data/",
-  # old_df = "merged_fb_ads_data.rds",
-  new_df = "merged_fb_ads_data.rds"
+  max_date = format((Sys.Date()), "%Y-%m-%d")
 )
 
 
