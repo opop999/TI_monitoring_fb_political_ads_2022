@@ -4,9 +4,7 @@
 
 ## Analysis of political advertisement on Meta-owned platforms.
 
-### The list of monitored political subjects below (in alphabetic order) was taken from the top 200 spenders in the 90 days prior to 9th September, as provided in [the country report of FB/Meta.](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ)
-
-**See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data)**
+### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data)
 
 ------------------------------------------------------------------------
 
@@ -15,6 +13,8 @@
 > Pekáček, Ondřej (2022). "Facebook Ad Library API" In APIs for social scientists: A collaborative review v1.0, edited by Paul C. Bauer, Camille Landesvatter & Lion Behrens. <https://doi.org/10.5281/zenodo.6798690>
 
 ------------------------------------------------------------------------
+
+**The list of monitored political subjects below (in alphabetic order) was taken from the top 200 spenders in the 90 days prior to 9th September, as provided in [the country report of FB/Meta.](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ)**
 
 | **POLITICAL SUBJECT**                                       | **NUMERIC ID**   |
 |:------------------------------------------------------------|:-----------------|
