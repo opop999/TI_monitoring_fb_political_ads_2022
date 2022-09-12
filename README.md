@@ -8,8 +8,16 @@
 
 **See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data)**
 
+------------------------------------------------------------------------
+
+**For more information about how to use FB Ads Library API to extract data about political advertising, see:**
+
+> Pekáček, Ondřej (2022). "Facebook Ad Library API" In APIs for social scientists: A collaborative review v1.0, edited by Paul C. Bauer, Camille Landesvatter & Lion Behrens. <https://doi.org/10.5281/zenodo.6798690>
+
+------------------------------------------------------------------------
+
 | **POLITICAL SUBJECT**                                       | **NUMERIC ID**   |
-|:----------------------------------------------------|:------------------|
+|:------------------------------------------------------------|:-----------------|
 | 1planet4all                                                 | 107536521911422  |
 | 3PK pro prosperující Českou Třebovou                        | 102161328913584  |
 | Adam Scheinherr                                             | 187407575190610  |
