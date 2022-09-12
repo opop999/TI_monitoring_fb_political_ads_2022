@@ -1,16 +1,16 @@
 ---
 title: "Facebook ADS"
-author: "Ondrej Pekacek for TI CZ"
+author: "Ondrej Pekacek/TI CZ"
 date: "Update `r format(Sys.time(),'%d. %m. %Y')`"
 output: 
   flexdashboard::flex_dashboard:
     logo: "data/logo_ti.png"
-    theme: cosmo
+    theme: readable
     orientation: columns
     vertical_layout: fill
     source_code: https://github.com/opop999/TI_monitoring_fb_political_ads_2022
     navbar:
-      - {title: "Project", icon: "ion-information-circled", href: "https://www.transparentnivolby.cz"}
+      - {title: "Project", icon: "ion-information-circled", href: "https://www.transparentnivolby.cz/komunalni-senat2022/"}
       - {title: "Author", icon: "ion-social-linkedin", href: "https://www.linkedin.com/in/ondrej-pekacek"}
       - {title: "Data: META", icon: "ion-cloud", href: "https://www.facebook.com/ads/library/"}
 ---
@@ -38,16 +38,6 @@ directory_datasets <- "data/"
 summary_dataset <- readRDS(file = paste0(directory_datasets, "summary_tables/merged_summary.rds"))
 time_dataset <- readRDS(file = paste0(directory_datasets, "summary_tables/time_summary.rds"))
 
-# Specify output directory for individual plots
-# directory <- "data/html_plots"
-
-# Check whether output directory exists to save individual plots
-# if (!dir.exists(directory)) {
-#   dir.create(directory)
-# } else {
-#   print("Output directory already exists")
-# }
-
 # Select TOP 10 biggest spenders for plotting
 top_10_spenders <- summary_dataset %>%
   slice_max(avg_spend, n = 10) %>%
@@ -71,164 +61,243 @@ Column {.tabset}
 ### **TOTAL ADS**
 
 ```{r}
-plot_total_ads <- ggplotly(summary_dataset %>%
-  filter(total_ads > 10) %>%
-  ggplot(aes(x = total_ads, y = reorder(page_name, total_ads), fill = percent_unique)) +
-  geom_col() +
-  scale_fill_gradient(
-    low = "#fbe8e7", high = "#db1d0b",
-    limits = c(0, 1),
-    breaks = c(0, 0.25, 0.50, 0.75, 1),
-    labels = c("0%", "25%", "50%", "75%", "100%")
-  ) +
-  scale_x_continuous(
-    breaks = seq(0, 2500, 250),
-    labels = seq(0, 2500, 250)
-  ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 4.5)) +
-  xlab("Total Ads") +
-  ylab(element_blank()) +
-  labs(fill = "Proportion unique ads") +
-  ggtitle(paste("Total Ads (pages with more than 10 ads) since", format(start_date, "%d.%m.%Y"))))
-
-plot_total_ads
-
-# saveWidget(plot_total_ads, file = paste0(directory, "/plot_total_ads.html"))
+ggplotly(
+  summary_dataset %>%
+    filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
+    mutate(page_name = reorder(page_name, total_ads)) %>%
+    ggplot(
+      aes(
+        x = total_ads,
+        y = page_name,
+        fill = percent_unique,
+        text = paste(
+          "Page:",
+          page_name,
+          "<br>Total ads:",
+          total_ads,
+          "<br>Proportion unique:",
+          percent_unique * 100, "%"
+        )
+      )
+    ) +
+    geom_col() +
+    scale_fill_gradient(
+      low = "#fbe8e7",
+      high = "#db1d0b",
+      limits = c(0, 1),
+      breaks = c(0, 0.25, 0.50, 0.75, 1),
+      labels = c("0%", "25%", "50%", "75%", "100%")
+    ) +
+    scale_x_continuous(
+      breaks = seq(0, 5000, 250),
+      labels = seq(0, 5000, 250)
+    ) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 4.5)) +
+    xlab("Total ads") +
+    ylab(element_blank()) +
+    labs(fill = "Proportion unique ads") +
+    ggtitle(paste(
+      "Total ads of top 50 spenders since",
+      format(start_date, "%d.%m.%Y")
+    )),
+  tooltip = "text"
+)
 
 ```
 
 ### **TOTAL SPENDING**
 
 ```{r}
-plot_total_spending <- ggplotly(summary_dataset %>%
-  filter(total_ads > 10) %>%
-  mutate(
-    avg_spend_1000 = round(avg_spend / 1000, digits = 0),
-    per_ad_avg_spend_1000 = round(per_ad_avg_spend / 1000, digits = 1)
-  ) %>%
-  ggplot(aes(x = avg_spend_1000, y = reorder(page_name, avg_spend), fill = per_ad_avg_spend_1000)) +
-  geom_col() +
-  scale_fill_gradient2(
-    low = "#cddae5",
-    mid = "#03457f",
-    high = "#023766",
-    midpoint = 12,
-    limits = c(0, 25)
-  ) +
-  scale_x_continuous(
-    breaks = seq(0, 3000, 250),
-    labels = seq(0, 3000, 250)
-  ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 4.5)) +
-  xlab("Total Spend (CZK thousands)") +
-  ylab(element_blank()) +
-  labs(fill = "Per Ad (CZK thousands)") +
-  ggtitle(paste("Spending on Ads (pages with more than 10 ads) since", format(start_date, "%d.%m.%Y"))))
-
-plot_total_spending
-
-# saveWidget(plot_total_spending, file = paste0(directory, "/plot_total_spending.html"))
+ggplotly(
+  summary_dataset %>%
+    filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
+    mutate(
+      avg_spend_1000 = round(avg_spend / 1000, digits = 0),
+      per_ad_avg_spend_1000 = round(per_ad_avg_spend / 1000, digits = 1),
+      page_name = reorder(page_name, avg_spend)
+    ) %>%
+    ggplot(
+      aes(x = avg_spend_1000, y = page_name, fill = per_ad_avg_spend_1000, text = paste(
+          "Page:",
+          page_name,
+          "<br>Total spend:",
+          avg_spend_1000,"thousand CZK",
+          "<br>Per ad avg spend:",
+          per_ad_avg_spend_1000, "thousand CZK"
+        ))
+    ) +
+    geom_col() +
+    scale_fill_gradient2(
+      low = "#cddae5",
+      mid = "#03457f",
+      high = "#023766",
+      midpoint = 25,
+      limits = c(0, 50)
+    ) +
+    scale_x_continuous(
+      breaks = seq(0, 5000, 250),
+      labels = seq(0, 5000, 250)
+    ) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 4.5)) +
+    xlab("Total spend (CZK thousands)") +
+    ylab(element_blank()) +
+    labs(fill = "Per ad (CZK thousands)") +
+    ggtitle(paste(
+      "Spending on ads of top 50 spenders since",
+      format(start_date, "%d.%m.%Y")
+    )), 
+  tooltip = "text"
+)
 
 ```
 
 ### **AD LENGTH** 
 
 ```{r}
-plot_avg_length <- ggplotly(summary_dataset %>%
-  filter(total_ads > 10) %>%
-  ggplot(aes(x = avg_words, y = reorder(page_name, avg_words))) +
-  geom_col(fill = "#320266") +
-  scale_x_continuous(
-    breaks = seq(0, 1500, 100),
-    labels = seq(0, 1500, 100)
-  ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 4.5)) +
-  xlab("Words") +
-  ylab(element_blank()) +
-  ggtitle(paste("Average Ad lenght (in words, pages with more than 10 ads) since", format(start_date, "%d.%m.%Y"))))
-
-plot_avg_length
-
-# saveWidget(plot_avg_length, file = paste0(directory, "/plot_avg_length.html"))
+ggplotly(
+  summary_dataset %>%
+    filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
+    mutate(page_name = reorder(page_name, avg_words)) %>%
+    ggplot(aes(
+      x = avg_words, y = page_name,
+      text = paste(
+          "Page:",
+          page_name,
+          "<br>Avg length per ad:",
+          avg_words, "words"
+        )
+    )) +
+    geom_col(fill = "#320266") +
+    scale_x_continuous(
+      breaks = seq(0, 1500, 100),
+      labels = seq(0, 1500, 100)
+    ) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 4.5)) +
+    xlab("Number of Words") +
+    ylab(element_blank()) +
+    ggtitle(
+      paste(
+        "Average ad length in words of top 50 spenders since",
+        format(start_date, "%d.%m.%Y")
+      )
+    ), 
+  tooltip = "text"
+)
 
 ```
 
 ### **AD RUNTIME** 
 
 ```{r}
-plot_total_runtime <- ggplotly(summary_dataset %>%
-  filter(total_ads > 10) %>%
-  ggplot(aes(x = avg_ad_runtime, y = reorder(page_name, avg_ad_runtime))) +
-  geom_col(fill = "#026663") +
-  scale_x_continuous(
-    breaks = seq(0, 150, 5),
-    labels = seq(0, 150, 5)
-  ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 4.5)) +
-  xlab("Days") +
-  ylab(element_blank()) +
-  ggtitle(paste("Average Ad runtime (pages with more than 10 ads) since", format(start_date, "%d.%m.%Y"))))
-
-plot_total_runtime
-
-# saveWidget(plot_total_runtime, file = paste0(directory, "/plot_total_runtime.html"))
+ggplotly(
+  summary_dataset %>%
+    filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
+    mutate(page_name = reorder(page_name, avg_ad_runtime)) %>%
+    ggplot(aes(
+      x = avg_ad_runtime, y = page_name, text = paste(
+          "Page:",
+          page_name,
+          "<br>Avg runtime:",
+          avg_ad_runtime, "days"
+        ))
+    ) +
+    geom_col(fill = "#026663") +
+    scale_x_continuous(breaks = seq(0, 150, 5),
+                       labels = seq(0, 150, 5)) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 4.5)) +
+    xlab("Days") +
+    ylab(element_blank()) +
+    ggtitle(
+      paste(
+        "Average ad runtime of top 50 spenders since",
+        format(start_date, "%d.%m.%Y")
+      )
+    ), 
+  tooltip = "text"
+)
 
 ```
 
 ### **IMPRESSIONS** 
 
 ```{r}
-plot_total_impressions <- ggplotly(summary_dataset %>%
-  filter(total_ads > 10) %>%
-  mutate(
-    avg_impressions_million = round(total_avg_impressions / 1000000, digits = 3),
-    per_ad_avg_impressions_1000 = round(per_ad_avg_impression / 1000, digits = 1)
-  ) %>%
-  ggplot(aes(x = avg_impressions_million, y = reorder(page_name, avg_impressions_million), fill = per_ad_avg_impressions_1000)) +
-  geom_col() +
-  scale_fill_gradient2(
-    low = "#e7fbe8",
-    mid = "#089914",
-    high = "#011603",
-    midpoint = 200,
-    limits = c(0, 400)
-  ) +
-  scale_x_sqrt(
-    breaks = seq(0, 100, 10),
-    labels = seq(0, 100, 10)
-  ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 4.5)) +
-  xlab("Total Impressions (millions, square root scale)") +
-  ylab(element_blank()) +
-  labs(fill = "Per Ad impressions (thousands)") +
-  ggtitle(paste("Total Ads impressions (pages with more than 10 ads) since", format(start_date, "%d.%m.%Y"))))
-
-plot_total_impressions
-
-# saveWidget(plot_total_impressions, file = paste0(directory, "/plot_total_impressions.html"))
+ggplotly(
+  summary_dataset %>%
+    filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
+    mutate(
+      avg_impressions_million = round(total_avg_impressions / 1000000, digits = 3),
+      per_ad_avg_impressions_1000 = round(per_ad_avg_impression / 1000, digits = 1),
+      page_name = reorder(page_name, avg_impressions_million)
+    ) %>%
+    ggplot(
+      aes(x = avg_impressions_million, y = page_name, fill = per_ad_avg_impressions_1000,
+          text = paste(
+          "Page:",
+          page_name,
+          "<br>Total impressions:",
+          avg_impressions_million, "million",
+          "<br>Avg impressions per ad:",
+          per_ad_avg_impressions_1000, "thousand"
+        ))
+    ) +
+    geom_col() +
+    scale_fill_gradient2(
+      low = "#e7fbe8",
+      mid = "#089914",
+      high = "#011603",
+      midpoint = 250,
+      limits = c(0, 500)
+    ) +
+    scale_x_continuous(breaks = seq(0, 1000, 5),
+                       labels = seq(0, 1000, 5)) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 4.5)) +
+    xlab("Total impressions (millions)") +
+    ylab(element_blank()) +
+    labs(fill = "Per Ad impressions (thousands)") +
+    ggtitle(paste(
+      "Total ads impressions of top 50 spenders since",
+      format(start_date, "%d.%m.%Y")
+    )), 
+  tooltip = "text"
+)
 
 ```
 
-### **TOTAL MINIMAL REACH**
+### **TOTAL MINIMAL AUDIENCE**
 
 ```{r}
-plot_total_reach <- ggplotly(
+ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
+    slice_max(avg_spend, n = 50) %>%
     mutate(
       avg_min_reach_million = round(total_min_reach / 1000000, digits = 2),
-      per_ad_avg_min_reach_1000 = round(per_ad_min_reach / 1000, digits = 0)
+      per_ad_avg_min_reach_1000 = round(per_ad_min_reach / 1000, digits = 0),
+      page_name = reorder(page_name, avg_min_reach_million)
     ) %>%
     ggplot(
       aes(
         x = avg_min_reach_million,
-        y = reorder(page_name, avg_min_reach_million),
-        fill = per_ad_avg_min_reach_1000
+        y = page_name,
+        fill = per_ad_avg_min_reach_1000,
+          text = paste(
+          "Page:",
+          page_name,
+          "<br>Total minimum audience:",
+          avg_min_reach_million, "million",
+          "<br>Avg audience per ad:",
+          per_ad_avg_min_reach_1000, "thousand"
+        )
       )
     ) +
     geom_col() +
@@ -236,30 +305,24 @@ plot_total_reach <- ggplotly(
       low = "#f0e6eb",
       mid = "#660237",
       high = "#14000b",
-      midpoint = 500,
-      limits = c(0, 1000)
+      midpoint = 1000,
+      limits = c(0, 2000)
     ) +
-    scale_x_sqrt(
-      breaks = seq(0, 5000, 25),
-      labels = seq(0, 5000, 25)
-    ) +
+    scale_x_continuous(breaks = seq(0, 5000, 50),
+                 labels = seq(0, 5000, 50)) +
     theme_minimal() +
     theme(axis.text.y = element_text(size = 4.5)) +
-    xlab("Total reach (millions)") +
+    xlab("Total audience (millions)") +
     ylab(element_blank()) +
-    labs(fill = "Per Ad reach (thousands)") +
+    labs(fill = "Per ad audience (thousands)") +
     ggtitle(
       paste(
-        "Total minimal reach of Ads (square root scale) since",
+        "Total minimal estimated audience of top 50 spenders since",
         format(start_date, "%d.%m.%Y")
       )
-    )
+    ),
+  tooltip = "text"
 )
-
-plot_total_reach
-
-# saveWidget(plot_total_reach, file = paste0(directory, "/plot_total_reach.html"))
-
 ```
 
 Trends
@@ -271,45 +334,71 @@ Column {.tabset}
 ### **SPENDING OVER TIME**
 
 ```{r}
-spend_over_time <- ggplotly(
+ggplotly(
   time_dataset %>%
     filter(page_id %in% top_10_spenders$page_id) %>%
     mutate(
-      ad_creation_time_week = as.Date(cut(ad_creation_time, breaks = "week", start.on.monday = TRUE)),
+      ad_creation_time_week = as.Date(cut(
+        ad_creation_time,
+        breaks = "week",
+        start.on.monday = TRUE
+      )),
       cumulative_spend_million = round((cumulative_spend / 1000000), digits = 3)
     ) %>%
     group_by(page_name, ad_creation_time_week) %>%
     summarise(end_of_week_million_spend = max(cumulative_spend_million)) %>%
     ungroup() %>%
-    ggplot(aes(x = ad_creation_time_week, y = end_of_week_million_spend, color = page_name)) +
-    geom_line() +
-    geom_point(size = 0.8) +
-    geom_vline(aes(xintercept = as.numeric(election_date)), color = "#563a3a", linetype = 2, size = 0.2) +
-    geom_text(aes(x = election_date, y = 0, label = "elections"), color = "#22209F", vjust = -1, size = 3, fontface = "bold", check_overlap = TRUE) +
-    theme_minimal() +
-    scale_y_continuous(
-      breaks = seq(0, 5, 0.25),
-      labels = seq(0, 5, 0.25)
+    ggplot(
+      aes(x = ad_creation_time_week, y = end_of_week_million_spend, color = page_name)
     ) +
+    geom_line() +
+    geom_point(size = 0.8, aes(text = paste(
+          "Page:",
+          page_name,
+          "<br>Week:",
+          ad_creation_time_week,
+          "<br>Cumulative spend:",
+          end_of_week_million_spend, "million CZK"
+        ))) +
+    geom_vline(
+      aes(xintercept = as.numeric(election_date)),
+      color = "#563a3a",
+      linetype = 2,
+      size = 0.2
+    ) +
+    geom_text(
+      aes(x = election_date, y = 0, label = "elections"),
+      color = "#22209F",
+      vjust = -1,
+      size = 3,
+      fontface = "bold",
+      check_overlap = TRUE
+    ) +
+    theme_minimal() +
+    scale_y_continuous(breaks = seq(0, 5, 0.25),
+                       labels = seq(0, 5, 0.25)) +
     scale_x_date(date_breaks = "1 months", date_labels = "%d.%m.%y") +
     coord_cartesian(xlim = c(start_date, end_date), expand = TRUE) +
-    theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(
+      legend.title = element_blank(),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
     xlab(element_blank()) +
     ylab("CZK million") +
-  	labs(color = "") +
-    ggtitle(paste("Spending (in CZK million) on Ads of 10 biggest spenders since", format(start_date, "%d.%m.%Y")))
+    labs(color = "") +
+    ggtitle(paste(
+      "Spending on ads of top 10 spenders since",
+      format(start_date, "%d.%m.%Y")
+    )),
+  tooltip = "text"
 )
-
-spend_over_time
-
-# saveWidget(spend_over_time, file = paste0(directory, "/plot_spend_over_time.html"))
 
 ```
 
 ### **SPENDING WEEKLY**
 
 ```{r}
-spend_weekly <- ggplotly(
+ggplotly(
   time_dataset %>%
     filter(page_id %in% top_10_spenders$page_id) %>%
     mutate(
@@ -318,7 +407,15 @@ spend_weekly <- ggplotly(
     group_by(page_name, end_of_week) %>% 
     summarise(by_week_thousands_spend = round(sum(avg_spend) / 1000, digits = 0)) %>% 
     ungroup() %>% 
-    ggplot(aes(x = end_of_week, y = by_week_thousands_spend, fill = page_name)) +
+    ggplot(aes(x = end_of_week, y = by_week_thousands_spend, fill = page_name, 
+          text = paste(
+          "Page:",
+          page_name,
+          "<br>Week:",
+          end_of_week,
+          "<br>Weekly spend:",
+          by_week_thousands_spend, "thousand CZK"
+        ))) +
     geom_col(width = 5.5) +
     geom_vline(xintercept = as.numeric(election_date), color = "#563a3a", linetype = 2, size = 0.2) +
     geom_text(aes(x = election_date, y = 0, label = "elections"), color = "#22209F", vjust = -1, size = 3, fontface = "bold", check_overlap = TRUE) +
@@ -333,12 +430,9 @@ spend_weekly <- ggplotly(
     xlab(element_blank()) +
     ylab("CZK thousand") +
   	labs(fill = "") +
-    ggtitle(paste("Weekly spending (in CZK thousand) on Ads of 10 biggest spenders since", format(start_date, "%d.%m.%Y")))
+    ggtitle(paste("Weekly spending on ads of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
+  tooltip = "text"
 )
-
-spend_weekly
-
-# saveWidget(spend_weekly, file = paste0(directory, "/plot_spend_weekly.html"))
 
 ```
 
@@ -351,10 +445,18 @@ Column {.tabset}
 ### **GENDER**
 
 ```{r}
-plot_gender <- ggplotly(
+ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    ggplot(aes(x = avg_male, y = reorder(page_name, avg_male), fill = avg_male)) +
+    slice_max(avg_spend, n = 50) %>%
+    mutate(page_name = reorder(page_name, avg_male)) %>% 
+    ggplot(aes(x = avg_male, y = page_name, fill = avg_male, text = paste(
+          "Page:",
+          page_name,
+          "<br>Proportion of male audience:",
+          avg_male * 100, "%"
+        )
+               )) +
     geom_col() +
     geom_vline(aes(xintercept = 0.5, color = "#db0b50")) +
     scale_fill_gradient(
@@ -363,26 +465,24 @@ plot_gender <- ggplotly(
     scale_x_continuous(
       limits = c(0, 1),
       breaks = seq(0, 1, 0.25),
-      labels = c("0%", "25%", "50%", "75%", "100%")
+      labels = c("0%", "25%", "50%", "75%", "100%"),
+      expand = c(0, 0)
     ) +
     theme_minimal() +
     theme(legend.position = "none") +
     theme(axis.text.y = element_text(size = 4.5)) +
-    xlab("Proportion Ads Targeting Male Audience") +
+    xlab("Proportion of ads targeting male audience") +
     ylab(element_blank()) +
-    ggtitle(paste("Proportion of Ads targeting male audience since", format(start_date, "%d.%m.%Y")))
+    ggtitle(paste("Gender targeting of top 50 spenders since", format(start_date, "%d.%m.%Y"))),
+  tooltip = "text"
 )
-
-plot_gender
-
-# saveWidget(plot_gender, file = paste0(directory, "/plot_gender.html"))
 
 ```
 
 ### **AGE**
 
 ```{r}
-plot_age <- ggplotly(
+ggplotly(
   summary_dataset %>%
     filter(page_id %in% top_10_spenders$page_id) %>%
     select(
@@ -395,7 +495,12 @@ plot_age <- ggplotly(
       avg_65_plus
     ) %>%
     pivot_longer(cols = 2:7, names_to = "age_group", values_to = "proportion", values_drop_na = TRUE) %>%
-    ggplot(aes(x = age_group, y = proportion, fill = page_name)) +
+    ggplot(aes(x = age_group, y = proportion, fill = page_name, text = paste(
+          "Page:",
+          page_name,
+          "<br>Proportion:",
+          proportion * 100, "% (out of 100 %)"
+        ))) +
     geom_col(position = "dodge2") +
     scale_x_discrete(labels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")) +
     scale_fill_brewer(palette = "Paired") +
@@ -409,12 +514,9 @@ plot_age <- ggplotly(
     xlab(element_blank()) +
     ylab(element_blank()) +
   	labs(fill = "") +
-    ggtitle(paste("Proportion of Ads of 10 biggest spenders targeting specific age group since", format(start_date, "%d.%m.%Y")))
+    ggtitle(paste("Age of audience of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
+  tooltip = "text"
 )
-
-plot_age
-
-# saveWidget(plot_age, file = paste0(directory, "/plot_age.html"))
 
 ```
 
@@ -422,7 +524,7 @@ plot_age
 ### **REGION**
 
 ```{r}
-plot_region <- ggplotly(
+ggplotly(
   summary_dataset %>%
     filter(page_id %in% top_10_spenders$page_id) %>%
     select(
@@ -443,7 +545,12 @@ plot_region <- ggplotly(
       avg_zlk
     ) %>%
     pivot_longer(cols = 2:15, names_to = "region_group", values_to = "proportion", values_drop_na = TRUE) %>%
-    ggplot(aes(x = region_group, y = proportion, fill = page_name)) +
+    ggplot(aes(x = region_group, y = proportion, fill = page_name, text = paste(
+          "Page:",
+          page_name,
+          "<br>Proportion:",
+          proportion * 100, "% (out of 100 %)"
+        ))) +
     geom_col(position = "dodge2") +
     scale_x_discrete(labels = c("HKK", "JHC", "JHM", "KVK", "LBK", "MSK", "OLK", "PAK", "PHA", "PLK", "STC", "ULK", "VYS", "ZLK")) +
     scale_fill_brewer(palette = "Paired") +
@@ -457,31 +564,10 @@ plot_region <- ggplotly(
     xlab(element_blank()) +
     ylab(element_blank()) +
   	labs(fill = "") +
-    ggtitle(paste("Proportion of Ads of 10 biggest spenders targeting specific region since", format(start_date, "%d.%m.%Y")))
+    ggtitle(paste("Regions of audience of ads of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
+  tooltip = "text"
 )
 
-plot_region
-
-# saveWidget(plot_region, file = paste0(directory, "/plot_region.html"))
-
 ```
 
-
-```{r cleanup, include=FALSE}
-# Because the saveWidget function does not correctly delete the dependency files
-# which are used to create individual self-sustaining widgets, we have to delete
-# them using R functions. All non-html files in output folder are deleted.
-
-# unlink(grep(
-#   x = list.files(
-#     path = directory,
-#     recursive = TRUE,
-#     full.names = TRUE
-#   ),
-#   pattern = "(.html)$",
-#   invert = TRUE,
-#   value = TRUE
-# ))
-
-```
 
