@@ -22,6 +22,6 @@
 
 -*total_avg_impressions*: This is calculated using the same logic as *avg_spend*, as Facebook only provides boundary values for impressions.
 
--*total_min_reach*: Total reach per political actor is calculated as a sum only from the *potential_reach_lower* variable of the raw dataset. The reason for this is that FB again provides only boundary values for the reach of the political ads *, however,* in this case, about 50% of the *potential_reach_higher* values are empty. This means that this calculation will likely underestimate the reach of the political advertising (and the same applies to the *per_ad_min_reach* variable).
+-*total_min_audience*: Total audience (previously called *reach* by FB) per political actor is calculated as a sum only from the *potential_audience_lower* variable of the raw dataset. The reason for this is that FB again provides only boundary values for the audience of the political ads *, however,* in this case, about 50% of the *potential_audience_higher* values are empty. This means that this calculation will likely underestimate the audience of the political advertising (and the same applies to the *per_ad_min_audience* variable).
 
 -*avg_ad_runtime*: average difference in days for a given political actor between the *ad_delivery_start_time* and the *ad_delivery_end_time* from the raw dataset.
