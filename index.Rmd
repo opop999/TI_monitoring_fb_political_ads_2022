@@ -20,7 +20,7 @@ output:
 options(scipen = 999)
 
 # Package names
-packages <- c("flexdashboard", "dplyr", "ggplot2", "plotly", "forcats", "htmlwidgets", "tidyr")
+packages <- c("flexdashboard", "dplyr", "ggplot2", "plotly", "forcats", "htmlwidgets", "tidyr", "reactable", "reactablefmtr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -64,7 +64,7 @@ Column {.tabset}
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(page_name = reorder(page_name, total_ads)) %>%
     ggplot(
       aes(
@@ -94,12 +94,11 @@ ggplotly(
       labels = seq(0, 5000, 250)
     ) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Total ads") +
     ylab(element_blank()) +
     labs(fill = "Proportion unique ads") +
     ggtitle(paste(
-      "Total ads of top 50 spenders since",
+      "Total ads of top 30 spenders since",
       format(start_date, "%d.%m.%Y")
     )),
   tooltip = "text"
@@ -113,7 +112,7 @@ ggplotly(
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(
       avg_spend_1000 = round(avg_spend / 1000, digits = 0),
       per_ad_avg_spend_1000 = round(per_ad_avg_spend / 1000, digits = 1),
@@ -142,12 +141,11 @@ ggplotly(
       labels = seq(0, 5000, 250)
     ) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Total spend (CZK thousands)") +
     ylab(element_blank()) +
     labs(fill = "Per ad (CZK thousands)") +
     ggtitle(paste(
-      "Spending on ads of top 50 spenders since",
+      "Spending on ads of top 30 spenders since",
       format(start_date, "%d.%m.%Y")
     )), 
   tooltip = "text"
@@ -161,7 +159,7 @@ ggplotly(
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(page_name = reorder(page_name, avg_words)) %>%
     ggplot(aes(
       x = avg_words, y = page_name,
@@ -178,12 +176,11 @@ ggplotly(
       labels = seq(0, 1500, 100)
     ) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Number of Words") +
     ylab(element_blank()) +
     ggtitle(
       paste(
-        "Average ad length in words of top 50 spenders since",
+        "Average ad length in words of top 30 spenders since",
         format(start_date, "%d.%m.%Y")
       )
     ), 
@@ -198,7 +195,7 @@ ggplotly(
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(page_name = reorder(page_name, avg_ad_runtime)) %>%
     ggplot(aes(
       x = avg_ad_runtime, y = page_name, text = paste(
@@ -212,12 +209,11 @@ ggplotly(
     scale_x_continuous(breaks = seq(0, 150, 5),
                        labels = seq(0, 150, 5)) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Days") +
     ylab(element_blank()) +
     ggtitle(
       paste(
-        "Average ad runtime of top 50 spenders since",
+        "Average ad runtime of top 30 spenders since",
         format(start_date, "%d.%m.%Y")
       )
     ), 
@@ -232,7 +228,7 @@ ggplotly(
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(
       avg_impressions_million = round(total_avg_impressions / 1000000, digits = 3),
       per_ad_avg_impressions_1000 = round(per_ad_avg_impression / 1000, digits = 1),
@@ -260,12 +256,11 @@ ggplotly(
     scale_x_continuous(breaks = seq(0, 1000, 5),
                        labels = seq(0, 1000, 5)) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Total impressions (millions)") +
     ylab(element_blank()) +
     labs(fill = "Per Ad impressions (thousands)") +
     ggtitle(paste(
-      "Total ads impressions of top 50 spenders since",
+      "Total ads impressions of top 30 spenders since",
       format(start_date, "%d.%m.%Y")
     )), 
   tooltip = "text"
@@ -279,7 +274,7 @@ ggplotly(
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(
       avg_min_reach_million = round(total_min_reach / 1000000, digits = 2),
       per_ad_avg_min_reach_1000 = round(per_ad_min_reach / 1000, digits = 0),
@@ -311,19 +306,49 @@ ggplotly(
     scale_x_continuous(breaks = seq(0, 5000, 50),
                  labels = seq(0, 5000, 50)) +
     theme_minimal() +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Total audience (millions)") +
     ylab(element_blank()) +
     labs(fill = "Per ad audience (thousands)") +
     ggtitle(
       paste(
-        "Total minimal estimated audience of top 50 spenders since",
+        "Total minimal estimated audience of top 30 spenders since",
         format(start_date, "%d.%m.%Y")
       )
     ),
   tooltip = "text"
 )
 ```
+
+### **ADS SUMMARY TABLE**
+
+```{r}
+summary_dataset %>%
+  select(1:13) %>%
+  reactable(
+    defaultPageSize = 15,
+    theme = nytimes(),
+    highlight = TRUE,
+    defaultSorted = c("page_name"),
+    filterable = TRUE,
+    striped = TRUE,
+    defaultColDef = colDef(filterable = FALSE),
+    columns = list(
+      "page_name" = colDef(name = "Page Name", filterable = TRUE, width = 120),
+      "page_id" = colDef(name = "Page ID", width = 120),
+      "total_ads" = colDef(name = "Total Ads", ),
+      "unique_ads" = colDef(name = "Unique Ads"),
+      "percent_unique" = colDef(name = "Proportion Unique", format = colFormat(percent = TRUE, digits = 1)),
+      "avg_words" = colDef(name = "Average Words"),
+      "avg_spend" = colDef(name = "Spend", format = colFormat(prefix = "CZK ", separators = TRUE, digits = 0)),
+      "per_ad_avg_spend" = colDef(name = "Per Ad Spend", format = colFormat(prefix = "CZK ", separators = TRUE, digits = 0)),
+      "total_avg_impressions" = colDef(name = "Total Impressions", format = colFormat(separators = TRUE, digits = 0)),
+      "per_ad_avg_impression" = colDef(name = "Per Ad Impressions", format = colFormat(separators = TRUE, digits = 0)),
+      "total_min_reach" = colDef(name = "Total Audience", format = colFormat(separators = TRUE, digits = 0)),
+      "per_ad_min_reach" = colDef(name = "Per Ad Min Audience", format = colFormat(separators = TRUE, digits = 0)),
+      "avg_ad_runtime" = colDef(name = "Average Runtime", format = colFormat(suffix = " days"))
+  ))
+```
+
 
 Trends
 =====================================
@@ -448,7 +473,7 @@ Column {.tabset}
 ggplotly(
   summary_dataset %>%
     filter(total_ads > 10) %>%
-    slice_max(avg_spend, n = 50) %>%
+    slice_max(avg_spend, n = 30) %>%
     mutate(page_name = reorder(page_name, avg_male)) %>% 
     ggplot(aes(x = avg_male, y = page_name, fill = avg_male, text = paste(
           "Page:",
@@ -470,10 +495,9 @@ ggplotly(
     ) +
     theme_minimal() +
     theme(legend.position = "none") +
-    theme(axis.text.y = element_text(size = 4.5)) +
     xlab("Proportion of ads targeting male audience") +
     ylab(element_blank()) +
-    ggtitle(paste("Gender targeting of top 50 spenders since", format(start_date, "%d.%m.%Y"))),
+    ggtitle(paste("Gender targeting of top 30 spenders since", format(start_date, "%d.%m.%Y"))),
   tooltip = "text"
 )
 
@@ -520,6 +544,26 @@ ggplotly(
 
 ```
 
+### **GENDER & AGE SUMMARY TABLE**
+
+```{r}
+summary_dataset %>%
+  select(c(1:2), 14:36) %>%
+  setNames(gsub("avg_", "", names(.))) %>%
+  reactable(
+    defaultPageSize = 15,
+    theme = nytimes(),
+    highlight = TRUE,
+    defaultSorted = c("page_name"),
+    filterable = TRUE,
+    striped = TRUE,
+    defaultColDef = colDef(filterable = FALSE, format = colFormat(percent = TRUE, digits = 1)),
+    columns = list(
+      "page_name" = colDef(name = "Page Name", filterable = TRUE, width = 120),
+      "page_id" = colDef(name = "Page ID", width = 120),
+      "female_65_plus" = colDef(width = 110)
+  ))
+```
 
 ### **REGION**
 
@@ -571,3 +615,22 @@ ggplotly(
 ```
 
 
+### **REGION SUMMARY TABLE**
+
+```{r}
+summary_dataset %>%
+  select(c(1:2), 37:ncol(.)) %>%
+  setNames(gsub("avg_", "", names(.))) %>%
+  reactable(
+    defaultPageSize = 15,
+    theme = nytimes(),
+    highlight = TRUE,
+    defaultSorted = c("page_name"),
+    filterable = TRUE,
+    striped = TRUE,
+    defaultColDef = colDef(filterable = FALSE, format = colFormat(percent = TRUE, digits = 1)),
+    columns = list(
+      "page_name" = colDef(name = "Page Name", filterable = TRUE, width = 120),
+      "page_id" = colDef(name = "Page ID", width = 120)
+  ))
+```

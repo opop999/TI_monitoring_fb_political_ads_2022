@@ -95,8 +95,19 @@ top_ads_scrape("div._7vgi:nth-of-type(4n+2)", "a._7vge._7via");
 # List all of the JSON data scraped from FB Ads library in the previous step
 json_chunks <- list.files(path = "data", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
 
-# Specify which entities are removed from the coverage
-remove_pages <- c("178362315106", "28312410177", "484856584931855")
+# Specify which entities are removed from the coverage. Since they publish ads in more countries, the number of distinct regions overwhelms the API, which is still an unresolved issue on FB side.
+
+remove_pages <-
+  c(
+    "European Parliament" = "178362315106",
+    "World Food Programme" = "28312410177",
+    "GoStudy" = "484856584931855",
+    "AdVenture Communist" = "100451933698060",
+    "UNICEF" = "68793499001",
+    "Council of the European Union" = "147547541961576",
+    "Azur Games" = "1238173096287495",
+    "ROLEX" = "288607211258386"
+  )
 
 # Read all of the JSON data chunks in. 
 pages_list <- json_chunks %>% 
@@ -108,7 +119,7 @@ pages_list <- json_chunks %>%
   # split(., ceiling(seq_along(.) / 10))
 
 # Save the list to the .rds file
-saveRDS(pages_list, "data/saved_pages_list.rds")
+saveRDS(pages_list, "doc/saved_pages_list.rds")
 
 # Delete the uneeded JSON chunks based on user input
 if (readline(prompt = "Do you want to delete the JSON chunks (y/n) : ") == "y") {

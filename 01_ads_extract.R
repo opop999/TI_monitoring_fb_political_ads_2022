@@ -32,7 +32,7 @@ options(scipen = 999)
 
 ############################### FUNCTION BEGGINING #############################
 
-get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_name = "data/", old_df = NA, new_df = "merged_dataset") {
+get_all_tables_merge <- function(token, account_ids, min_date, max_date, regions, dir_name = "data/", old_df = NA, new_df = "merged_dataset") {
   
   if (nchar(token) < 50) { stop("Token is missing or misspecified.") }
   
@@ -114,6 +114,9 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
           censor_access_token = TRUE
         )
     }
+    
+    Sys.sleep(runif(1, 0, 0.3))
+    
   }
   
   saveRDS(object = fb_ad_list, file = paste0(dir_name, "fb_ad_list.rds"))
@@ -124,25 +127,35 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
   # and merge into one. The demographic & region datasets are in the "long"
   # format and we need a transformation to a "wide" format of the ad dataset
   
-  fb_ad_list[["ad"]] <-  fb_ad_list[["ad"]] %>%
+  fb_ad_list[["ad"]] <- fb_ad_list[["ad"]] %>%
     bind_rows() %>%
-    mutate(ad_creation_time = as.Date(ad_creation_time),
+    mutate(
+      ad_creation_time = as.Date(ad_creation_time),
       ad_delivery_start_time = as.Date(ad_delivery_start_time),
       ad_creative_bodies = map_chr(ad_creative_bodies, ~ ifelse(is.null(.x), "", .x[[1]])),
       ad_creative_link_captions = map_chr(ad_creative_link_captions, ~ ifelse(is.null(.x), "", .x[[1]])),
       ad_creative_link_titles = map_chr(ad_creative_link_titles, ~ ifelse(is.null(.x), "", .x[[1]])),
       languages = map_chr(languages, ~ ifelse(is.null(.x), NA, .x[[1]])),
       publisher_platforms = map_chr(publisher_platforms, ~ ifelse(is.null(.x), NA, paste(.x, collapse = ", "))),
-      ad_delivery_stop_time = as.Date(ifelse(is.na(ad_delivery_stop_time), max_date, ad_delivery_stop_time)),
-      ad_creative_link_descriptions = map_chr(ad_creative_link_descriptions, ~ ifelse(is.null(.x), "", .x[[1]])))
+      ad_delivery_stop_time = as.Date(ifelse(
+        is.na(ad_delivery_stop_time),
+        max_date,
+        ad_delivery_stop_time
+      )),
+      ad_creative_link_descriptions = map_chr(ad_creative_link_descriptions, ~ ifelse(is.null(.x), "", .x[[1]]))
+    ) %>%
+    distinct(id, .keep_all = TRUE)
   
-  fb_ad_list[["demographic"]] <-  fb_ad_list[["demographic"]] %>%
+  fb_ad_list[["demographic"]] <- fb_ad_list[["demographic"]] %>%
     bind_rows() %>%
-    unnest(col = "demographic_distribution") %>% 
+    unnest(col = "demographic_distribution") %>%
     mutate(percentage = round(percentage, 3)) %>%
+    filter(age != "All (Automated App Ads)" |
+             gender != "All (Automated App Ads)") %>%
+    distinct(id, age, gender, .keep_all = TRUE) %>%
     pivot_wider(
       id_cols = id,
-      names_from = c("gender", "age"),
+      names_from = c(gender, age),
       values_from = percentage,
       names_sort = TRUE
     )
@@ -150,7 +163,9 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
   fb_ad_list[["region"]] <- fb_ad_list[["region"]] %>%
     bind_rows() %>%
     unnest(col = "delivery_by_region") %>% 
+    filter(region %in% regions) %>%
     mutate(percentage = round(percentage, 3)) %>%
+    distinct(id, region, .keep_all = TRUE) %>%
     pivot_wider(
       id_cols = id,
       names_from = region,
@@ -174,10 +189,6 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
     merged_dataset <- bind_rows(existing_fb_dataset, merged_dataset) %>% distinct()
   }
   
-  # Temp fix for data quality issue
-  merged_dataset <- merged_dataset %>% 
-    mutate(across(where(is.list), ~ map_dbl(.x, ~ ifelse(is.null(.x), NA, .x[[1]]))))
-  
   saveRDS(merged_dataset, file = paste0(dir_name, new_df, ".rds"))
   fwrite(merged_dataset, file = paste0(dir_name, new_df, ".csv"))
   
@@ -188,9 +199,25 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, dir_nam
 # PART 3: RUNNING THE FUNCTION WITH APPROPRIATE ARGUMENTS
 get_all_tables_merge(
   token = Sys.getenv("FB_TOKEN"),
-  account_ids = readRDS("data/saved_pages_list.rds"),
+  account_ids = readRDS("doc/saved_pages_list.rds"),
   min_date = "2022-04-13",
-  max_date = format((Sys.Date()), "%Y-%m-%d")
+  max_date = format((Sys.Date()), "%Y-%m-%d"),
+  regions = c(
+    "Prague",
+    "Central Bohemian Region",
+    "South Bohemian Region",
+    "Plzeň Region",
+    "Karlovy Vary Region",
+    "Ústí nad Labem Region",
+    "Liberec Region",
+    "Hradec Králové Region",
+    "Pardubice Region",
+    "Vysočina Region",
+    "South Moravian Region",
+    "Olomouc Region",
+    "Moravian-Silesian Region",
+    "Zlín Region"
+  )
 )
 
 
