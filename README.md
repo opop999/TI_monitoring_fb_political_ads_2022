@@ -1,5 +1,7 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
+![Logo TI](https://www.transparentnivolby.cz/komunalni-senat2022/wp-content/themes/2022krajsenat/images/logo_new.png)
+
 # Transparency International (CZ) election monitoring: [2022 Czech municipal and senate elections](https://www.transparentnivolby.cz/komunalni-senat2022/)
 
 ## Analysis of political advertisement on Meta-owned platforms.
