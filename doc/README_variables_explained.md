@@ -3,7 +3,7 @@
 ### The summary tables input the information of the raw ads contained in the data folder (one row equals one advertisement) and aggregates them on the level of each advertiser (one row equals one actor).
 
 ### Data transformation notes:
- -Only entites with at least one political ad since 1 January 2021 are included in the summary tables.
+ -Only entites with at least one political ad since 13 April 2022 are included in the summary tables.
  
  -Only Czech regions are included in the region summary & merged tables. 
  
