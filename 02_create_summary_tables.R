@@ -164,6 +164,38 @@ merged_summary <- ad_summary %>%
   inner_join(demographic_summary, by = c("page_name", "page_id", "total_ads")) %>%
   inner_join(region_summary, by = c("page_name", "page_id", "total_ads"))
 
+# Calculate spending by region
+regional_spenders <- merged_summary %>%
+  select(
+    c(
+      "page_name",
+      "page_id",
+      "avg_spend",
+      "avg_pha",
+      "avg_stc",
+      "avg_jhc",
+      "avg_plk",
+      "avg_kvk",
+      "avg_ulk",
+      "avg_lbk",
+      "avg_hkk",
+      "avg_pak",
+      "avg_vys",
+      "avg_jhm",
+      "avg_olk",
+      "avg_msk",
+      "avg_zlk"
+    )
+  ) %>%
+  pivot_longer(4:17, names_to = "region", values_to = "spend_proportion") %>%
+  transmute(page_name,
+            page_id,
+            region,
+            regional_spend = round(avg_spend * spend_proportion, 0)) 
+
+
 fwrite(merged_summary, paste0(directory, "/summary_tables/merged_summary.csv"))
 saveRDS(object = merged_summary, file = paste0(directory, "/summary_tables/merged_summary.rds"))
+fwrite(regional_spenders, paste0(directory, "/summary_tables/regional_spenders.csv"))
+saveRDS(object = regional_spenders, file = paste0(directory, "/summary_tables/regional_spenders.rds"))
 

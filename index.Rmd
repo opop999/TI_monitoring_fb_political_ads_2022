@@ -4,8 +4,10 @@ author: "Ondrej Pekacek/TI CZ"
 date: "Update `r format(Sys.time(),'%d. %m. %Y')`"
 output: 
   flexdashboard::flex_dashboard:
-    logo: "data/logo_ti.png"
+    logo: "doc/logo_ti.png"
     theme: readable
+    includes:
+      in_header: "doc/header.html"
     orientation: columns
     vertical_layout: fill
     source_code: https://github.com/opop999/TI_monitoring_fb_political_ads_2022
@@ -37,6 +39,7 @@ directory_datasets <- "data/"
 # Import datasets created in the previous script
 summary_dataset <- readRDS(file = paste0(directory_datasets, "summary_tables/merged_summary.rds"))
 time_dataset <- readRDS(file = paste0(directory_datasets, "summary_tables/time_summary.rds"))
+regional_spenders <- readRDS(file = paste0(directory_datasets, "summary_tables/regional_spenders.rds"))
 
 # Select TOP 10 biggest spenders for plotting
 top_10_spenders <- summary_dataset %>%
@@ -333,8 +336,8 @@ summary_dataset %>%
     striped = TRUE,
     defaultColDef = colDef(filterable = FALSE),
     columns = list(
-      "page_name" = colDef(name = "Page Name", filterable = TRUE, width = 120),
-      "page_id" = colDef(name = "Page ID", width = 120),
+      "page_name" = colDef(name = "Page Name", sticky = "left", filterable = TRUE, width = 120),
+      "page_id" = colDef(name = "Page ID", sticky = "left", width = 120),
       "total_ads" = colDef(name = "Total Ads", ),
       "unique_ads" = colDef(name = "Unique Ads"),
       "percent_unique" = colDef(name = "Proportion Unique", format = colFormat(percent = TRUE, digits = 1)),
@@ -565,7 +568,7 @@ summary_dataset %>%
   ))
 ```
 
-### **REGION**
+### **REGIONAL**
 
 ```{r}
 ggplotly(
@@ -630,7 +633,88 @@ summary_dataset %>%
     striped = TRUE,
     defaultColDef = colDef(filterable = FALSE, format = colFormat(percent = TRUE, digits = 1)),
     columns = list(
-      "page_name" = colDef(name = "Page Name", filterable = TRUE, width = 120),
-      "page_id" = colDef(name = "Page ID", width = 120)
+      "page_name" = colDef(name = "Page Name", sticky = "left",filterable = TRUE, width = 120),
+      "page_id" = colDef(name = "Page ID", sticky = "left", width = 120)
   ))
 ```
+
+
+### **TOP SPENDERS BY REGION**
+
+```{r}
+ggplotly(
+  regional_spenders %>%
+    group_by(region) %>%
+    slice_max(regional_spend, n = 10) %>%
+    ungroup() %>% 
+    mutate(regional_spend_1000 = round(regional_spend/1000, 0),
+          page_name = reorder(page_name, regional_spend_1000)) %>% 
+    ggplot(aes(
+      x = region, y = regional_spend_1000, fill = page_name,
+         text = paste(
+          "Page:",
+          page_name,
+          "<br>Regional spend:",
+          regional_spend_1000, "thousand CZK"
+        )
+    )) +
+    geom_col(position = "dodge2") +  scale_x_discrete(
+  labels = c(
+    "HKK",
+    "JHC",
+    "JHM",
+    "KVK",
+    "LBK",
+    "MSK",
+    "OLK",
+    "PAK",
+    "PHA",
+    "PLK",
+    "STC",
+    "ULK",
+    "VYS",
+    "ZLK"
+  )
+) +
+  scale_y_continuous(
+      breaks = seq(0, 1000, 100),
+      labels = seq(0, 1000, 100)
+    ) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  xlab(element_blank()) +
+  ylab("CZK thousand") +
+  labs(fill = "") +
+  ggtitle(paste(
+    "Top 10 spenders in each region (out of top 500 overall spenders) since",
+    format(start_date, "%d.%m.%Y")
+  )),
+  tooltip = "text")
+
+
+
+
+```
+
+
+### **TOP SPENDERS BY REGION TABLE**
+
+```{r}
+regional_spenders %>%
+  pivot_wider(names_from = "region", values_from = "regional_spend") %>%
+  setNames(gsub("avg_", "", names(.))) %>%
+  select("page_name", "page_id","hkk", "jhc", "jhm", "kvk", "lbk", "msk", "olk", "pak", "pha", "plk", "stc", "ulk", "vys", "zlk") %>% 
+  reactable(
+    defaultPageSize = 15,
+    theme = nytimes(),
+    highlight = TRUE,
+    defaultSorted = c("page_name"),
+    filterable = TRUE,
+    striped = TRUE,
+    defaultColDef = colDef(filterable = FALSE, format = colFormat(prefix = "CZK ", separators = TRUE, digits = 0)),
+    columns = list(
+      "page_name" = colDef(name = "Page Name", sticky = "left", width = 120, format = colFormat()),
+      "page_id" = colDef(name = "Page ID", sticky = "left", width = 120, format = colFormat())
+  ))
+```
+
