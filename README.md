@@ -1,5 +1,7 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
+[![GH Actions: Automated daily extraction of FB political ads](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/blob/main/.github/workflows/docker.yml/badge.svg?branch=main)](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/actions/workflows/docker.yml)
+
 [![Logo TI](https://www.transparentnivolby.cz/komunalni-senat2022/wp-content/themes/2022krajsenat/images/logo_new.png)](https://www.transparentnivolby.cz/komunalni-senat2022/)
 
 # Transparency International (CZ) election monitoring: [2022 Czech municipal and senate elections](https://www.transparentnivolby.cz/komunalni-senat2022/)
