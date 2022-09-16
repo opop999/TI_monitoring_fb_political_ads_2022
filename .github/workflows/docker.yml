@@ -57,11 +57,3 @@ jobs:
         git add data/* index.html
         git commit -am "GH Action $(date)"
         git push origin main
-      # env:
-      #   REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-      #   username: github-actions
-
-
-
-
-sudo /usr/bin/docker run --user rstudio --name rstudio_tidyverse --workdir /github/workspace --rm -ti -e PASSWORD=yourpassword -p 8787:8787 -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" rocker/tidyverse:latest bash
