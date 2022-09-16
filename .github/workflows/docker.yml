@@ -13,18 +13,46 @@ jobs:
   extract:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    container: rocker/tidyverse:latest
-
+    # container: 
+    #   image: rocker/tidyverse:latest
     # Load repo and run the extraction script
     steps:
-    - uses: actions/checkout@v3
-    - name: 1. Check validity of FB ADS API token
+    - name: Checkout
+      uses: actions/checkout@v3
+          # Load repo and run the scraping script
+    - name: Pull Rstudio/Tidyverse Docker image
+      run: sudo docker pull rocker/tidyverse:latest
+    - name: Run Rstudio/Tidyverse container
+      run: sudo /usr/bin/docker run --user rstudio --name rstudio_tidyverse --label f88420 -e DISABLE_AUTH=true --workdir /github/workspace --rm -e HOME -e GITHUB_JOB -e GITHUB_REF -e GITHUB_SHA -e GITHUB_REPOSITORY -e GITHUB_REPOSITORY_OWNER -e GITHUB_RUN_ID -e GITHUB_RUN_NUMBER -e GITHUB_RETENTION_DAYS -e GITHUB_RUN_ATTEMPT -e GITHUB_ACTOR -e GITHUB_WORKFLOW -e GITHUB_HEAD_REF -e GITHUB_BASE_REF -e GITHUB_EVENT_NAME -e GITHUB_SERVER_URL -e GITHUB_API_URL -e GITHUB_GRAPHQL_URL -e GITHUB_WORKSPACE -e GITHUB_ACTION -e GITHUB_EVENT_PATH -e GITHUB_ACTION_REPOSITORY -e GITHUB_ACTION_REF -e GITHUB_PATH -e GITHUB_ENV -e RUNNER_OS -e RUNNER_NAME -e RUNNER_TOOL_CACHE -e RUNNER_TEMP -e RUNNER_WORKSPACE -e ACTIONS_RUNTIME_URL -e ACTIONS_RUNTIME_TOKEN -e ACTIONS_CACHE_URL -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/test_selenium/test_selenium":"/github/workspace" rocker/tidyverse:latest bash
+    - name: Get container info
+      run: |
+        docker ps
+        docker network ls
+        
+      # Add new files in specified folder, commit along with other modified files, push
+    - name: 4. Install necessary packages for dashboard
+      run: Rscript -e "install.packages(c('flexdashboard', 'plotly', 'htmlwidgets', 'reactable', 'reactablefmtr'), Ncpus = parallel::detectCores())"
+    - name: 5. Update dashboard for GitHub Pages
+      run: Rscript -e "rmarkdown::render('index.Rmd')"
+    - name: 6. Print information about the session
+      run: Rscript -e "sessionInfo()"      
+    - name: 7. Commit newly updated files        
+      run: |
+        git config --local user.name "actions-user""
+        git config --local user.email "actions@github.com"
+        git add data/* index.html
+        git commit -am "GH Action $(date)"
+        git push origin main
       env:
-          FB_TOKEN: ${{ secrets.FB_TOKEN }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-      run: Rscript 00_check_token_validity.R
+        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+        username: github-actions
+    # - name: 1. Check validity of FB ADS API token
+    #   env:
+    #       FB_TOKEN: ${{ secrets.FB_TOKEN }}
+    #       EMAIL_USER: ${{ secrets.EMAIL_USER }}
+    #       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+    #       EMAIL_TO: ${{ secrets.EMAIL_TO }}
+    #   run: Rscript 00_check_token_validity.R
     # - name: 2. Extract FB Ads using API
     # # This action needs a FB API token as an environment variable (we are using GitHub Secrets). We also need to get GH personal access token, because we are installing Radlibrary from GH repository
     #   env:
@@ -33,23 +61,13 @@ jobs:
     #   run: Rscript 01_ads_extract.R
     # - name: 3. Create summarized data
     #   run: Rscript 02_create_summary_tables.R
-    - name: 4. Install necessary packages for dashboard
-      run: Rscript -e "install.packages(c('flexdashboard', 'plotly', 'htmlwidgets', 'reactable', 'reactablefmtr'))"
-    - name: 5. Update dashboard for GitHub Pages
-      run: Rscript -e "rmarkdown::render('index.Rmd')"
-    - name: 6. Print information about the session
-      run: Rscript -e "sessionInfo()"
 
-    # Add new files in specified folder, commit along with other modified files, push
-    - name: 7. Commit newly updated files
-      env:
-        REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-        username: github-actions    
-      run: |
-        git config user.name actions-user
-        git config user.email actions@github.com
-        git pull
-        git add data/* index.html
-        git commit -am "GH Action $(date)"
-        git push origin main
+# 
+#       run: |
+#         git config user.name actions-user
+#         git config user.email actions@github.com
+#         git pull
+#         git add data/* index.html
+#         git commit -am "GH Action $(date)"
+#         git push origin main
 
