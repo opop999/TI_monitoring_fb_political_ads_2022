@@ -25,14 +25,14 @@ jobs:
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
       run: Rscript 00_check_token_validity.R
-    - name: 2. Extract FB Ads using API
-    # This action needs a FB API token as an environment variable (we are using GitHub Secrets). We also need to get GH personal access token, because we are installing Radlibrary from GH repository
-      env:
-          FB_TOKEN: ${{ secrets.FB_TOKEN }}
-          GITHUB_PAT: ${{ secrets.GH_PAT }}
-      run: Rscript 01_ads_extract.R
-    - name: 3. Create summarized data
-      run: Rscript 02_create_summary_tables.R
+    # - name: 2. Extract FB Ads using API
+    # # This action needs a FB API token as an environment variable (we are using GitHub Secrets). We also need to get GH personal access token, because we are installing Radlibrary from GH repository
+    #   env:
+    #       FB_TOKEN: ${{ secrets.FB_TOKEN }}
+    #       GITHUB_PAT: ${{ secrets.GH_PAT }}
+    #   run: Rscript 01_ads_extract.R
+    # - name: 3. Create summarized data
+    #   run: Rscript 02_create_summary_tables.R
     - name: 4. Install necessary packages for dashboard
       run: Rscript -e "install.packages(c('flexdashboard', 'plotly', 'htmlwidgets', 'reactable', 'reactablefmtr'))"
     - name: 5. Update dashboard for GitHub Pages
