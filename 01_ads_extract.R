@@ -199,7 +199,7 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, regions
 # PART 3: RUNNING THE FUNCTION WITH APPROPRIATE ARGUMENTS
 get_all_tables_merge(
   token = Sys.getenv("FB_TOKEN"),
-  account_ids = readRDS("doc/saved_pages_list.rds"),
+  account_ids = readRDS("doc/saved_pages_list.rds")[1:10],
   min_date = "2022-04-13",
   max_date = format((Sys.Date()), "%Y-%m-%d"),
   regions = c(

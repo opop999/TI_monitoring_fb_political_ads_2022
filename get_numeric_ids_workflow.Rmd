@@ -93,7 +93,7 @@ top_ads_scrape("div._7vgi:nth-of-type(4n+2)", "a._7vge._7via");
 
 ```{r}
 # List all of the JSON data scraped from FB Ads library in the previous step
-json_chunks <- list.files(path = "data", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
+json_chunks <- list.files(path = "data/fb_report_spenders/", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
 
 # Specify which entities are removed from the coverage. Since they publish ads in more countries, the number of distinct regions overwhelms the API, which is still an unresolved issue on FB side.
 
