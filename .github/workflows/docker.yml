@@ -27,7 +27,7 @@ jobs:
     - name: Get container info
       run: |
         docker ps
-        Rscript -e "saveRDS(iris, data/test.rds)"
+        Rscript -e "saveRDS(iris, 'data/test.rds')"
         
       # Add new files in specified folder, commit along with other modified files, push
 #    - name: 4. Install necessary packages for dashboard
