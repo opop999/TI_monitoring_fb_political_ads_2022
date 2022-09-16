@@ -7,7 +7,7 @@ on:
   schedule:
     - cron:  '00 12 * * *'
   push:
-    branches: master
+    branches: main
 
 jobs:
   extract:
@@ -49,7 +49,7 @@ jobs:
     #     git config --local user.email "actions@github.com"
     #     git add data/* index.html
     #     git commit -am "GH Action $(date)"
-    #     git push origin master
+    #     git push origin main
     #   env:
     #     REPO_KEY: ${{secrets.GITHUB_TOKEN}}
     #     username: github-actions
