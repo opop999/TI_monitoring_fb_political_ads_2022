@@ -119,7 +119,7 @@ get_all_tables_merge <- function(token, account_ids, min_date, max_date, regions
     
   }
   
-  saveRDS(object = fb_ad_list, file = paste0(dir_name, "fb_ad_list.rds"))
+  # saveRDS(object = fb_ad_list, file = paste0(dir_name, "fb_ad_list.rds"))
   
   
   # C. MERGE PART OF THE FUNCTION
