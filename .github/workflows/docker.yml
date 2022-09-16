@@ -27,15 +27,15 @@ jobs:
     - name: Get container info
       run: |
         docker ps
-        docker network ls
+        Rscript -e "saveRDS(iris, data/test.rds)"
         
       # Add new files in specified folder, commit along with other modified files, push
-    - name: 4. Install necessary packages for dashboard
-      run: Rscript -e "install.packages(c('flexdashboard', 'plotly', 'htmlwidgets', 'reactable', 'reactablefmtr'), Ncpus = parallel::detectCores())"
-    - name: 5. Update dashboard for GitHub Pages
-      run: Rscript -e "rmarkdown::render('index.Rmd')"
-    - name: 6. Print information about the session
-      run: Rscript -e "sessionInfo()"      
+#    - name: 4. Install necessary packages for dashboard
+#      run: Rscript -e "install.packages(c('flexdashboard', 'plotly', 'htmlwidgets', 'reactable', 'reactablefmtr'), Ncpus = parallel::detectCores())"
+#    - name: 5. Update dashboard for GitHub Pages
+#      run: Rscript -e "rmarkdown::render('index.Rmd')"
+#    - name: 6. Print information about the session
+#      run: Rscript -e "sessionInfo()"      
     - name: 7. Commit newly updated files        
       run: |
         git config --local user.name "actions-user""
