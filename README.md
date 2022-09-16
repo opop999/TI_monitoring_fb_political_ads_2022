@@ -6,7 +6,7 @@
 
 ## Analysis of political advertisement on Meta-owned platforms.
 
-### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data)
+### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data). For a previous similar workflow concerning the 2021 Czech legislative elections, please see its [repository](https://github.com/opop999/TI_monitoring_fb_political_ads_2021) and [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2021/).
 
 ------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@
 
 ------------------------------------------------------------------------
 
-**The list of monitored political subjects below (in alphabetic order) was taken from the top 500 spenders in the 90 days prior to 13th September, as provided in [the country report of FB/Meta.](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ)**
+**The list of monitored political subjects below (in alphabetic order) was taken from the last 90 days' top 500 spenders\* prior to 13th September, as provided in [the country report of FB/Meta.](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ)**
 
 | **POLITICAL SUBJECT**                                                     | **NUMERIC ID**   |
 |:-------------------------------------------------|:-----------|
