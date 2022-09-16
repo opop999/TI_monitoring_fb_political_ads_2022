@@ -55,6 +55,7 @@ jobs:
     - name: 7. Commit newly updated files        
       run: |
         date > test.txt
+        git config --global --add safe.directory /__w/TI_monitoring_fb_political_ads_2022/TI_monitoring_fb_political_ads_2022
         git status
         # git config --local user.name "actions-user"
         # git config --local user.email "actions@github.com"
