@@ -12,7 +12,7 @@
 
 ------------------------------------------------------------------------
 
-**For more information about how to use FB Ads Library API to extract data about political advertising, see:**
+**For more information about how to use FB Ads Library API to extract data about political advertising, see the [following chapter](https://bookdown.org/paul/apis_for_social_scientists/facebook-ad-library-api.html):**
 
 > Pekáček, Ondřej (2022). "Facebook Ad Library API" In APIs for social scientists: A collaborative review v1.0, edited by Paul C. Bauer, Camille Landesvatter & Lion Behrens. <https://doi.org/10.5281/zenodo.6798690>
 
