@@ -18,10 +18,13 @@
 
 ------------------------------------------------------------------------
 
+**Key disclaimers:**
+- some monitored ads are not textual and only contain image/video, so we cannot assess their length in words
+
+------------------------------------------------------------------------
+
 **The list of monitored political subjects below (in alphabetic order) was taken from the last 90 days' top 500 spenders\* prior to 13th September, as provided in [the country report of FB/Meta.](https://www.facebook.com/ads/library/report/?source=archive-landing-page&country=CZ)**
 
-**Key disclaimers**
-- some monitored ads are not textual and only contain image/video, so we cannot assess their lenght in words
 
 | **POLITICAL SUBJECT**                                                     | **NUMERIC ID**   |
 |:-------------------------------------------------|:-----------|
