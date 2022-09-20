@@ -18,6 +18,13 @@ options(scipen = 999)
 # Specify directory
 directory <- "data"
 
+# Specify currency rate to CZK for conversion of ad amounts
+usd_rate <- 24.606
+eur_rate <- 24.495
+pln_rate <- 5.196
+vnd_rate <- 0.001
+
+
 full_ads_table <- readRDS(paste0(directory, "/merged_dataset.rds"))
 
 if (!dir.exists(paste0(directory, "/summary_tables"))) {
@@ -32,6 +39,21 @@ if (!dir.exists(paste0(directory, "/summary_tables"))) {
 # Percentage figures rounded to 3 decimal places
 ad_summary <- full_ads_table %>%
   select(1:21) %>%
+  # A small minority of ads is not in Czech currency and requires conversion
+  mutate(spend_lower = round(case_when(
+    currency == "CZK"  ~ spend_lower,
+    currency == "USD"  ~ spend_lower * usd_rate,
+    currency == "EUR"  ~ spend_lower * eur_rate,
+    currency == "PLN"  ~ spend_lower * pln_rate,
+    currency == "VND"  ~ spend_lower * vnd_rate
+  ), digits = 0),
+  spend_upper = round(case_when(
+    currency == "CZK"  ~ spend_upper,
+    currency == "USD"  ~ spend_upper * usd_rate,
+    currency == "EUR"  ~ spend_upper * eur_rate,
+    currency == "PLN"  ~ spend_upper * pln_rate,
+    currency == "VND"  ~ spend_upper * vnd_rate
+  ), digits = 0)) %>% 
   group_by(page_name, page_id) %>%
   summarise(
     total_ads = n(),
