@@ -42,8 +42,7 @@ ad_summary <- full_ads_table %>%
     per_ad_avg_spend = round(avg_spend / total_ads, digits = 0),
     total_avg_impressions = round(((sum(impressions_lower, na.rm = TRUE) + sum(impressions_upper, na.rm = TRUE)) / 2), digits = 0),
     per_ad_avg_impression = round(total_avg_impressions / total_ads, digits = 0),
-    total_min_reach = sum(estimated_audience_size_lower, na.rm = TRUE),
-    per_ad_min_reach = round(total_min_reach / total_ads, digits = 0),
+    avg_ad_min_audience = round(mean(estimated_audience_size_lower, na.rm = TRUE), digits = 0),
     avg_ad_runtime = round(mean(ad_delivery_stop_time - ad_delivery_start_time, na.rm = TRUE), digits = 1)
   ) %>%
   arrange(desc(total_ads)) %>%

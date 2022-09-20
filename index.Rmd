@@ -271,7 +271,7 @@ ggplotly(
 
 ```
 
-### **TOTAL MINIMAL AUDIENCE**
+### **AVERAGE AUDIENCE**
 
 ```{r}
 ggplotly(
@@ -279,42 +279,30 @@ ggplotly(
     filter(total_ads > 10) %>%
     slice_max(avg_spend, n = 30) %>%
     mutate(
-      avg_min_reach_million = round(total_min_reach / 1000000, digits = 2),
-      per_ad_avg_min_reach_1000 = round(per_ad_min_reach / 1000, digits = 0),
-      page_name = reorder(page_name, avg_min_reach_million)
+      avg_ad_min_audience_1000 = round(avg_ad_min_audience / 1000, digits = 0),
+      page_name = reorder(page_name, avg_ad_min_audience_1000)
     ) %>%
     ggplot(
       aes(
-        x = avg_min_reach_million,
+        x = avg_ad_min_audience_1000,
         y = page_name,
-        fill = per_ad_avg_min_reach_1000,
           text = paste(
           "Page:",
           page_name,
-          "<br>Total minimum audience:",
-          avg_min_reach_million, "million",
-          "<br>Avg audience per ad:",
-          per_ad_avg_min_reach_1000, "thousand"
+          "<br>Average minimal audience:",
+          avg_ad_min_audience_1000, "thousand"
         )
       )
     ) +
-    geom_col() +
-    scale_fill_gradient2(
-      low = "#f0e6eb",
-      mid = "#660237",
-      high = "#14000b",
-      midpoint = 1000,
-      limits = c(0, 2000)
-    ) +
-    scale_x_continuous(breaks = seq(0, 5000, 50),
-                 labels = seq(0, 5000, 50)) +
+    geom_col(fill = "#94d9ee") +
+    scale_x_continuous(breaks = seq(0, 2000, 100),
+                 labels = seq(0, 2000, 100)) +
     theme_minimal() +
-    xlab("Total audience (millions)") +
+    xlab("Average targeted audience size (thousands)") +
     ylab(element_blank()) +
-    labs(fill = "Per ad audience (thousands)") +
     ggtitle(
       paste(
-        "Total minimal estimated audience of top 30 spenders since",
+        "Average minimal estimated audience of top 30 spenders since",
         format(start_date, "%d.%m.%Y")
       )
     ),
@@ -326,7 +314,7 @@ ggplotly(
 
 ```{r}
 summary_dataset %>%
-  select(1:13) %>%
+  select(1:12) %>%
   reactable(
     defaultPageSize = 15,
     theme = nytimes(),
@@ -346,8 +334,7 @@ summary_dataset %>%
       "per_ad_avg_spend" = colDef(name = "Per Ad Spend", format = colFormat(prefix = "CZK ", separators = TRUE, digits = 0)),
       "total_avg_impressions" = colDef(name = "Total Impressions", format = colFormat(separators = TRUE, digits = 0)),
       "per_ad_avg_impression" = colDef(name = "Per Ad Impressions", format = colFormat(separators = TRUE, digits = 0)),
-      "total_min_reach" = colDef(name = "Total Audience", format = colFormat(separators = TRUE, digits = 0)),
-      "per_ad_min_reach" = colDef(name = "Per Ad Min Audience", format = colFormat(separators = TRUE, digits = 0)),
+      "avg_ad_min_audience" = colDef(name = "Average Ad Min Audience", format = colFormat(separators = TRUE, digits = 0)),
       "avg_ad_runtime" = colDef(name = "Average Runtime", format = colFormat(suffix = " days"))
   ))
 ```
