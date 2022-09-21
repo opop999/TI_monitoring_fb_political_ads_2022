@@ -18,9 +18,7 @@
 
 ------------------------------------------------------------------------
 
-**Key disclaimers:**
-- some monitored ads are not textual and only contain image/video, so we cannot assess their length in words
-- a small minority of ads in other currency than CZK have been converted according to the Czech National Bank exchange rate on 17th September, 2022
+**For more information on the analytical process, including its limitations, [please see this document](doc/README_variables_explained.md).**
 
 ------------------------------------------------------------------------
 
