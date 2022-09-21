@@ -1,8 +1,14 @@
-## This document intends to explain the meaning and logic behind some of the variables included in the summary tables.
+## This document intends to explain the limitations and data processing decisions in this analytical pipeline. 
+
+### Furthermore, it discusses the meaning and logic behind some of the variables included in the summary tables.
 
 ### The summary tables input the information of the raw ads contained in the data folder (one row equals one advertisement) and aggregates them on the level of each advertiser (one row equals one actor).
 
-### Data transformation notes:
+### Key disclaimers to the research:
+- Some monitored ads are not textual and only contain image/video, so we cannot assess their length in words
+
+- A small minority of ads in other currency than CZK have been converted according to the Czech National Bank exchange rate on 17th September, 2022
+
  -Only entites with at least one political ad since 13 April 2022 are included in the summary tables.
  
  -Only Czech regions are included in the region summary & merged tables. 
