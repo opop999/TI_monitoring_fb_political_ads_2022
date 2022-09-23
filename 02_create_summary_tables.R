@@ -24,11 +24,12 @@ eur_rate <- 24.495
 pln_rate <- 5.196
 vnd_rate <- 0.001
 
-# Specify the end date for the data collection.
-analysis_end_date <- as.Date("2022-09-17")
+# # Specify the end date for the data collection.
+# ads_create_end_date <- as.Date("2022-09-18")
+# ads_display_end_date <- as.Date("2022-09-19")
 
-full_ads_table <- readRDS(paste0(directory, "/merged_dataset.rds")) %>% 
-  filter(ad_creation_time <= analysis_end_date)
+full_ads_table <- readRDS(paste0(directory, "/merged_dataset.rds")) # %>% 
+  # filter(ad_creation_time <= ads_create_end_date & ad_delivery_start_time <= ads_display_end_date)
 
 if (!dir.exists(paste0(directory, "/summary_tables"))) {
   dir.create(paste0(directory, "/summary_tables"))

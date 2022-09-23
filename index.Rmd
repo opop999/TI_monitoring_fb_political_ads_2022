@@ -1,7 +1,7 @@
 ---
 title: "Facebook ADS"
 author: "Ondrej Pekacek/TI CZ"
-date: "Update `r format(as.Date('2022-09-17'),'%d. %m. %Y')`"
+date: "Update `r format(Sys.Date(),'%d. %m. %Y')`"
 output: 
   flexdashboard::flex_dashboard:
     logo: "doc/logo_ti.png"
