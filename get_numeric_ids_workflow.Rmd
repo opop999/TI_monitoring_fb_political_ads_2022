@@ -95,7 +95,11 @@ top_ads_scrape("div._7vgi:nth-of-type(4n+2)", "a._7vge._7via");
 # List all of the JSON data scraped from FB Ads library in the previous step
 json_chunks <- list.files(path = "data/fb_report_spenders/", pattern = "top_spenders_p_[0-9]+\\.json", full.names = TRUE)
 
-# Specify which entities are removed from the coverage. Since they publish ads in more countries, the number of distinct regions overwhelms the API, which is still an unresolved issue on FB side.
+# Create a list of all of the subject we are interested in getting the political advertising info about.
+
+# Specify "ad_info" list element, which contains entities for which we shall only extract the ad information and not the demographic/region one. Since these entities publish ads in more countries, the number of distinct regions overwhelms the API, which is still an unresolved issue on FB side.
+pages_list <- vector(mode = "list", length = 2) %>%
+  setNames(c("ads_only", "all_info"))
 
 remove_pages <-
   c(
@@ -109,10 +113,18 @@ remove_pages <-
     "ROLEX" = "288607211258386"
   )
 
+pages_list[["ads_only"]] <- remove_pages
+
+pages_list[["all_info"]] <- json_chunks %>% 
+  map(read_json) %>% 
+  unlist(recursive = TRUE) %>%
+  .[!. %in% remove_pages]
+
+
 # Read all of the JSON data chunks in. 
 pages_list <- json_chunks %>% 
   map(read_json) %>% 
-  unlist(recursive = TRUE) %>%
+  unlist(recursive = FALSE) %>%
   .[!. %in% remove_pages]
 # Optional: If using batch API query with multiple entities per call, you need to create a list of max 10 entities per element due to the limitations of the FB Ads API.
   #  %>% 
