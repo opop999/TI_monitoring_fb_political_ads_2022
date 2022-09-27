@@ -1,7 +1,7 @@
 ---
 title: "Facebook ADS"
-author: "Ondrej Pekacek/TI CZ"
-date: "Update `r format(Sys.Date(),'%d. %m. %Y')`"
+author: "Ondrej Pekacek & TI CZ"
+date: "`r format(as.Date('2022-09-25'),'%d. %m. %Y')`"
 output: 
   flexdashboard::flex_dashboard:
     logo: "doc/logo_ti.png"
@@ -14,7 +14,7 @@ output:
     navbar:
       - {title: "Project", icon: "ion-information-circled", href: "https://www.transparentnivolby.cz/komunalni-senat2022/"}
       - {title: "Author", icon: "ion-social-linkedin", href: "https://www.linkedin.com/in/ondrej-pekacek"}
-      - {title: "Data: META", icon: "ion-cloud", href: "https://www.facebook.com/ads/library/"}
+      - {title: "Data", icon: "ion-cloud", href: "https://www.facebook.com/ads/library/"}
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +22,7 @@ output:
 options(scipen = 999)
 
 # Package names
-packages <- c("flexdashboard", "dplyr", "ggplot2", "plotly", "forcats", "htmlwidgets", "tidyr", "reactable", "reactablefmtr")
+packages <- c("flexdashboard", "dplyr", "ggplot2", "plotly", "forcats", "htmlwidgets", "tidyr", "reactable", "reactablefmtr", "stringr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -47,7 +47,7 @@ top_10_spenders <- summary_dataset %>%
   select(page_name, page_id, avg_spend)
 
 # Election date for vertical line in the time-plots
-election_date <- as.Date("2022-09-23")
+election_date <- as.Date("2022-09-25")
 
 # Graph zoom date end & beginning
 start_date <- as.Date("2022-04-13")
@@ -64,7 +64,7 @@ if (!dir.exists(directory)) {
 }
 ```
 
-Summaries
+Ads
 =====================================
 
 Column {.tabset}
@@ -88,8 +88,9 @@ plot_total_ads <- ggplotly(
           page_name,
           "<br>Total ads:",
           total_ads,
-          "<br>Proportion unique:",
-          percent_unique * 100, "%"
+          "<br>Proportion unique ads:",
+          percent_unique * 100,
+          "%"
         )
       )
     ) +
@@ -101,11 +102,13 @@ plot_total_ads <- ggplotly(
       breaks = c(0, 0.25, 0.50, 0.75, 1),
       labels = c("0%", "25%", "50%", "75%", "100%")
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     scale_x_continuous(
-      breaks = seq(0, 5000, 250),
-      labels = seq(0, 5000, 250)
+      breaks = seq(0, 5000, 500),
+      labels = seq(0, 5000, 500)
     ) +
     theme_minimal() +
+    theme(legend.position = "none") +
     xlab("Total ads") +
     ylab(element_blank()) +
     labs(fill = "Proportion unique ads") +
@@ -114,7 +117,8 @@ plot_total_ads <- ggplotly(
       format(start_date, "%d.%m.%Y")
     )),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_total_ads
 
@@ -152,10 +156,12 @@ plot_total_spending <- ggplotly(
       limits = c(0, 50)
     ) +
     scale_x_continuous(
-      breaks = seq(0, 5000, 250),
-      labels = seq(0, 5000, 250)
+      breaks = seq(0, 5000, 500),
+      labels = seq(0, 5000, 500)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
+    theme(legend.position = "none") +
     xlab("Total spend (CZK thousands)") +
     ylab(element_blank()) +
     labs(fill = "Per ad (CZK thousands)") +
@@ -164,7 +170,8 @@ plot_total_spending <- ggplotly(
       format(start_date, "%d.%m.%Y")
     )),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_total_spending
 
@@ -193,6 +200,7 @@ plot_ad_length <- ggplotly(
       breaks = seq(0, 1500, 100),
       labels = seq(0, 1500, 100)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
     xlab("Number of Words") +
     ylab(element_blank()) +
@@ -203,7 +211,8 @@ plot_ad_length <- ggplotly(
       )
     ),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_ad_length
 
@@ -231,6 +240,7 @@ plot_ad_runtime <- ggplotly(
       breaks = seq(0, 150, 5),
       labels = seq(0, 150, 5)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
     xlab("Days") +
     ylab(element_blank()) +
@@ -241,7 +251,8 @@ plot_ad_runtime <- ggplotly(
       )
     ),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_ad_runtime
 
@@ -282,10 +293,12 @@ plot_ad_impressions <- ggplotly(
       limits = c(0, 500)
     ) +
     scale_x_continuous(
-      breaks = seq(0, 1000, 5),
-      labels = seq(0, 1000, 5)
+      breaks = seq(0, 1000, 10),
+      labels = seq(0, 1000, 10)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
+    theme(legend.position = "none") +
     xlab("Total impressions (millions)") +
     ylab(element_blank()) +
     labs(fill = "Per Ad impressions (thousands)") +
@@ -294,7 +307,8 @@ plot_ad_impressions <- ggplotly(
       format(start_date, "%d.%m.%Y")
     )),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_ad_impressions
 
@@ -326,9 +340,10 @@ plot_ad_audience <- ggplotly(
     ) +
     geom_col(fill = "#94d9ee") +
     scale_x_continuous(
-      breaks = seq(0, 2000, 100),
-      labels = seq(0, 2000, 100)
+      breaks = seq(0, 2000, 250),
+      labels = seq(0, 2000, 250)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
     xlab("Average targeted audience size (thousands)") +
     ylab(element_blank()) +
@@ -339,7 +354,8 @@ plot_ad_audience <- ggplotly(
       )
     ),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_ad_audience
 
@@ -394,7 +410,7 @@ plot_spend_over_time <- ggplotly(
         ad_creation_time,
         breaks = "week",
         start.on.monday = TRUE
-      )),
+      )) + 6,
       cumulative_spend_million = round((cumulative_spend / 1000000), digits = 3)
     ) %>%
     group_by(page_name, ad_creation_time_week) %>%
@@ -427,6 +443,7 @@ plot_spend_over_time <- ggplotly(
       check_overlap = TRUE
     ) +
     theme_minimal() +
+    theme(legend.position = "none") +
     scale_y_continuous(
       breaks = seq(0, 5, 0.25),
       labels = seq(0, 5, 0.25)
@@ -445,7 +462,8 @@ plot_spend_over_time <- ggplotly(
       format(start_date, "%d.%m.%Y")
     )),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_spend_over_time
 
@@ -459,7 +477,7 @@ plot_spend_weekly <- ggplotly(
   time_dataset %>%
     filter(page_id %in% top_10_spenders$page_id) %>%
     mutate(
-      end_of_week = as.Date(cut(ad_creation_time, breaks = "week", start.on.monday = TRUE)),
+      end_of_week = as.Date(cut(ad_creation_time, breaks = "week", start.on.monday = TRUE)) + 6,
     ) %>%
     group_by(page_name, end_of_week) %>%
     summarise(by_week_thousands_spend = round(sum(avg_spend) / 1000, digits = 0)) %>%
@@ -479,6 +497,7 @@ plot_spend_weekly <- ggplotly(
     geom_vline(xintercept = as.numeric(election_date), color = "#563a3a", linetype = 2, size = 0.2) +
     geom_text(aes(x = election_date, y = 0, label = "elections"), color = "#22209F", vjust = -1, size = 3, fontface = "bold", check_overlap = TRUE) +
     theme_minimal() +
+    theme(legend.position = "none") +
     scale_y_continuous(
       breaks = seq(0, 5000, 200),
       labels = seq(0, 5000, 200)
@@ -491,14 +510,15 @@ plot_spend_weekly <- ggplotly(
     labs(fill = "") +
     ggtitle(paste("Weekly spending on ads of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_spend_weekly
 
 saveWidget(plot_spend_weekly, file = paste0(directory, "/plot_spend_weekly.html"))
 ```
 
-Demographics
+Audience
 =====================================
 
 Column {.tabset}
@@ -529,13 +549,15 @@ plot_gender <- ggplotly(
       labels = c("0%", "25%", "50%", "75%", "100%"),
       expand = c(0, 0)
     ) +
+    scale_y_discrete(label = function(x) str_trunc(x, 16)) +
     theme_minimal() +
     theme(legend.position = "none") +
     xlab("Proportion of ads targeting male audience") +
     ylab(element_blank()) +
     ggtitle(paste("Gender targeting of top 30 spenders since", format(start_date, "%d.%m.%Y"))),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_gender
 
@@ -573,13 +595,14 @@ plot_age <- ggplotly(
       labels = c("0%", "10%", "20%", "30%", "40%", "50%")
     ) +
     theme_minimal() +
-    theme(legend.title = element_blank()) +
+    theme(legend.title = element_blank(), legend.position = "none") +
     xlab(element_blank()) +
     ylab(element_blank()) +
     labs(fill = "") +
     ggtitle(paste("Age of audience of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_age
 
@@ -605,7 +628,7 @@ summary_dataset %>%
       "page_id" = colDef(name = "Page ID", width = 120),
       "female_65_plus" = colDef(width = 110)
     )
-  )
+  ) 
 ```
 
 ### **REGIONAL**
@@ -647,14 +670,15 @@ plot_region <- ggplotly(
       labels = c("0%", "10%", "20%", "30%", "40%", "50%")
     ) +
     theme_minimal() +
-    theme(legend.title = element_blank()) +
+    theme(legend.title = element_blank(), legend.position = "none") +
     xlab(element_blank()) +
     ylab(element_blank()) +
     labs(fill = "") +
     ggtitle(paste("Regions of audience of ads of top 10 spenders since", format(start_date, "%d.%m.%Y"))),
   tooltip = "text"
-)
-
+) %>%
+  config(displayModeBar = FALSE)
+ 
 plot_region
 
 saveWidget(plot_region, file = paste0(directory, "/plot_region.html"))
@@ -733,18 +757,19 @@ plot_top_spenders_by_region <- ggplotly(
       labels = seq(0, 1000, 100)
     ) +
     theme_minimal() +
-    theme(legend.title = element_blank()) +
+    theme(legend.title = element_blank(), legend.position = "none") +
     xlab(element_blank()) +
     ylab("CZK thousand") +
     labs(fill = "") +
     ggtitle(
       paste(
-        "Top 10 spenders in each region (out of top 500 overall spenders) since",
+        "Top 10 spenders in each region since",
         format(start_date, "%d.%m.%Y")
       )
     ),
   tooltip = "text"
-)
+) %>%
+  config(displayModeBar = FALSE)
 
 plot_top_spenders_by_region
 
