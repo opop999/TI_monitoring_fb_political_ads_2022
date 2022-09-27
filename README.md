@@ -4,11 +4,12 @@
 
 [![Logo TI](https://www.transparentnivolby.cz/komunalni-senat2022/wp-content/themes/2022krajsenat/images/logo_new.png)](https://www.transparentnivolby.cz/komunalni-senat2022/)
 
-# Transparency International (CZ) election monitoring: [2022 Czech municipal and senate elections](https://www.transparentnivolby.cz/komunalni-senat2022/)
+# Transparency International (CZ) election monitoring: <br> [2022 Czech municipal and senate elections](https://www.transparentnivolby.cz/komunalni-senat2022/)
 
 ## Analysis of political advertisement on Meta-owned platforms.
 
-### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data). For a previous similar workflow concerning the 2021 Czech legislative elections, please see its [repository](https://github.com/opop999/TI_monitoring_fb_political_ads_2021) and [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2021/).
+### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data).
+### For a previous similar workflow concerning the 2021 Czech legislative elections, please see its [repository](https://github.com/opop999/TI_monitoring_fb_political_ads_2021) and [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2021/).
 
 ------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@
 
 ------------------------------------------------------------------------
 
+**Data last updated on September 25, 2022.** <br>
 **For more information on the analytical process, including its limitations, [please see this document](doc/README_variables_explained.md).**
 
 ------------------------------------------------------------------------
