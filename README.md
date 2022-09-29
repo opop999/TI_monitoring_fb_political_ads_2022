@@ -8,7 +8,7 @@
 
 ## Analysis of political advertisement on Meta-owned platforms.
 
-### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data.](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data).
+### See [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2022/) with visualizations and [raw data](https://github.com/opop999/TI_monitoring_fb_political_ads_2022/tree/main/data).
 ### For a previous similar workflow concerning the 2021 Czech legislative elections, please see its [repository](https://github.com/opop999/TI_monitoring_fb_political_ads_2021) and [dashboard](https://opop999.github.io/TI_monitoring_fb_political_ads_2021/).
 
 ------------------------------------------------------------------------
